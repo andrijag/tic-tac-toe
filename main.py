@@ -2,11 +2,11 @@ import tkinter as tk
 from tkinter import ttk
 
 class Application(tk.Tk):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self):
+        super().__init__()
         self.title('TicTacToe')
-        #root.geometry('800x600')
-        #root.resizable(width=False, height=False)
+        self.geometry('200x200')
+        self.resizable(width=True, height=True)
 
 def main():
     app = Application()
