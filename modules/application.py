@@ -1,9 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-
-class View(ttk.Frame):
-    def __init__(self, parent):
-        super().__init__(parent)
+from .view import View
 
 
 class Application(tk.Tk):
@@ -15,4 +12,3 @@ class Application(tk.Tk):
 
         view = View(self)
         view.pack(fill=tk.BOTH, expand=True)
-
