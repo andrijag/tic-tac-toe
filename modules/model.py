@@ -25,8 +25,39 @@ class Board():
             for j in range(self.n):
                 self.board[i][j] = 0
 
+    def countLeft(self, i, j):
+        if j >= 0 and self.board[i][j] == self.board[i][j + 1] != 0:
+            return 1 + self.countLeft(i, j - 1)
+        return 0
+
+    def countRight(self, i, j):
+        if j < self.m and self.board[i][j] == self.board[i][j - 1] != 0:
+            return 1 + self.countRight(i, j + 1)
+        return 0
+
+    def countUp(self, i, j):
+        if i >= 0 and self.board[i][j] == self.board[i + 1][j] != 0:
+            return 1 + self.countUp(i - 1, j)
+        return 0
+
+    def countDown(self, i, j):
+        if i < self.n and self.board[i][j] == self.board[i - 1][j] != 0:
+            return 1 + self.countDown(i + 1, j)
+        return 0
+
+    def checkRow(self, i, j):
+        return 1 + self.countLeft(i, j - 1) + self.countRight(i, j + 1) == CONNECT_N
+
+    def checkColumn(self, i, j):
+        return 1 + self.countUp(i - 1, j) + self.countDown(i + 1, j) == CONNECT_N
+
+    def checkDiagonals(self, i, j):
+        pass 
+
     def check(self, i, j):
-        pass
+        return self.checkRow(i, j) \
+            or self.checkColumn(i, j) \
+            or self.checkDiagonals(i, j)
 
 
 class Player():
@@ -50,7 +81,16 @@ class Players():
 
 
 class Game():
-    def __init__(self):
+    def __init__(self, m, n, k):
         self.players = Players(N_PLAYERS)
         self.player = self.players.nextPlayer()
-        self.board = Board(N_ROWS, N_COLUMNS)
+        self.board = Board(m, n)
+
+game = Game(N_ROWS, N_COLUMNS, CONNECT_N)
+game.board.set(0, 1, 1)
+game.board.set(1, 0, 1)
+game.board.set(1, 1, 1)
+game.board.set(1, 2, 1)
+game.board.set(2, 1, 1)
+print(game.board.board)
+print(game.board.check(0, 0))
