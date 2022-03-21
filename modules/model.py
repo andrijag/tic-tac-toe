@@ -25,47 +25,24 @@ class Board():
             for j in range(self.n):
                 self.board[i][j] = 0
 
-    def countLeft(self, i, j):
-        if j >= 0 and self.board[i][j] == self.board[i][j + 1] != 0:
-            return 1 + self.countLeft(i, j - 1)
+    def countTo(self, i, j, di, dj):
+        if 0 <= i < self.n and 0 <= j < self.n and self.board[i + di][j + dj] == self.board[i][j]:
+                return 1 + self.countTo(i, j, di, dj) 
         return 0
 
-    def countRight(self, i, j):
-        if j < self.m and self.board[i][j] == self.board[i][j - 1] != 0:
-            return 1 + self.countRight(i, j + 1)
-        return 0
-
-    def countUp(self, i, j):
-        if i >= 0 and self.board[i][j] == self.board[i + 1][j] != 0:
-            return 1 + self.countUp(i - 1, j)
-        return 0
-
-    def countDown(self, i, j):
-        if i < self.n and self.board[i][j] == self.board[i - 1][j] != 0:
-            return 1 + self.countDown(i + 1, j)
-        return 0
-
-    def checkRow(self, i, j):
-        return 1 + self.countLeft(i, j - 1) + self.countRight(i, j + 1) == CONNECT_N
-
-    def checkColumn(self, i, j):
-        return 1 + self.countUp(i - 1, j) + self.countDown(i + 1, j) == CONNECT_N
-
-    def checkDiagonals(self, i, j):
-        pass 
+    def checkLine(self, i, j, di, dj):
+        return 1 + self.countTo(i, j, di, dj) + self.countTo(i, j, - di, - dj) == CONNECT_N
 
     def check(self, i, j):
-        return self.checkRow(i, j) \
-            or self.checkColumn(i, j) \
-            or self.checkDiagonals(i, j)
+        return self.checkLine(i, j, 0, 1) \
+            or self.checkLine(i, j, 1, 0) \
+            or self.checkLine(i, j, 1, 1) \
+            or self.checkLine(i, j, 1, -1)
 
 
 class Player():
     def __init__(self, n):
         self.n = n
-
-    def __str__(self):
-        return str(self.n)
 
     def tick(self, board, i, j):
         board.set(i, j, self.n)
@@ -87,10 +64,3 @@ class Game():
         self.board = Board(m, n)
 
 game = Game(N_ROWS, N_COLUMNS, CONNECT_N)
-game.board.set(0, 1, 1)
-game.board.set(1, 0, 1)
-game.board.set(1, 1, 1)
-game.board.set(1, 2, 1)
-game.board.set(2, 1, 1)
-print(game.board.board)
-print(game.board.check(0, 0))
