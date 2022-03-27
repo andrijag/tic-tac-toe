@@ -20,8 +20,8 @@ class Board:
         row = (0, 1)
         column = (1, 0)
         diagonal = (1, 1)
-        antiDiagonal = (-1, 1)
-        self.vectors = (row, column, diagonal, antiDiagonal)
+        anti_diagonal = (-1, 1)
+        self.vectors = (row, column, diagonal, anti_diagonal)
 
     def set(self, i, j, value):
         self.board[i][j] = value
@@ -31,20 +31,20 @@ class Board:
             for j in range(self.n_columns):
                 self.board[i][j] = 0
 
-    def countConsecutive(self, i, j, di, dj):
+    def count_consecutive(self, i, j, di, dj):
         prev = self.board[i][j]
         i, j = i + di, j + dj
         if 0 <= i < self.n_rows and 0 <= j < self.n_columns and self.board[i][j] == prev:
-            return 1 + self.countConsecutive(i, j, di, dj)
+            return 1 + self.count_consecutive(i, j, di, dj)
         return 0
 
-    def checkInDirection(self, i, j, di, dj):
-        return 1 + self.countConsecutive(i, j, di, dj) \
-            + self.countConsecutive(i, j, -di, -dj) == self.connect_n
+    def check_direction(self, i, j, di, dj):
+        return 1 + self.count_consecutive(i, j, di, dj) \
+            + self.count_consecutive(i, j, -di, -dj) == self.connect_n
 
     def check(self, i, j):
         for vector in self.vectors:
-            if self.checkInDirection(i, j, *vector):
+            if self.check_direction(i, j, *vector):
                 return True
 
 
@@ -62,7 +62,7 @@ class Players:
         players = (Player(i) for i in range(1, n_players + 1))
         self.iterator = cycle(players)
 
-    def nextPlayer(self):
+    def next_player(self):
         return next(self.iterator)
 
 
@@ -70,7 +70,7 @@ class Game:
     def __init__(self, n_rows, n_columns, connect_n):
         n_players = 2
         self.players = Players(n_players)
-        self.player = self.players.nextPlayer()
+        self.player = self.players.next_player()
         self.board = Board(n_rows, n_columns, connect_n)
 
 
