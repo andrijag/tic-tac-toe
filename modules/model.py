@@ -35,18 +35,19 @@ class Checker:
         anti_diagonal = (a - b for a, b in zip(row, column))
         self.vectors = (row, column, diagonal, anti_diagonal)
 
-    def count_consecutive(self, i, j, di, dj):
+    def count_consecutive(self, i, j, di, dj, depth):
         prev = self.board[i][j]
         i, j = i + di, j + dj
         if (0 <= i < self.board.n_rows and
             0 <= j < self.board.n_columns and
+            depth < self.connect_n and
             self.board[i][j] == prev):
-            return 1 + self.count_consecutive(i, j, di, dj)
+            return 1 + self.count_consecutive(i, j, di, dj, depth + 1)
         return 0
 
     def count_direction(self, i, j, di, dj):
-        direction = self.count_consecutive(i, j, di, dj)
-        opposite_direction = self.count_consecutive(i, j, -di, -dj)
+        direction = self.count_consecutive(i, j, di, dj, 0)
+        opposite_direction = self.count_consecutive(i, j, -di, -dj, 0)
         return 1 + direction + opposite_direction
 
     def check(self, i, j):
