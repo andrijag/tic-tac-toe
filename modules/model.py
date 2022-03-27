@@ -44,14 +44,14 @@ class Checker:
             return 1 + self.count_consecutive(i, j, di, dj)
         return 0
 
-    def check_direction(self, i, j, di, dj):
+    def count_direction(self, i, j, di, dj):
         direction = self.count_consecutive(i, j, di, dj)
         opposite_direction = self.count_consecutive(i, j, -di, -dj)
-        return 1 + direction + opposite_direction == self.connect_n
+        return 1 + direction + opposite_direction
 
     def check(self, i, j):
         for vector in self.vectors:
-            if self.check_direction(i, j, *vector):
+            if self.count_direction(i, j, *vector) >= self.connect_n:
                 return True
 
 
