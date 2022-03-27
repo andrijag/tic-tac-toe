@@ -10,25 +10,6 @@ class Matrix(list):
         super().__init__([0 for j in range(n)] for i in range(m))
 
 
-class Vector(list):
-    def __init__(self, *args):
-        super().__init__(args)
-
-    def __add__(self, vector):
-        return Vector(*(a + b for a, b in zip(self, vector)))
-
-    def __sub__(self, vector):
-        return Vector(*(a - b for a, b in zip(self, vector)))
-
-    def __neg__(self):
-        return Vector(*(-a for a in self))
-
-    def __iadd__(self, vector):
-        for i in range(len(self)):
-            self[i] += vector[i]
-        return self
-
-
 class Board:
     def __init__(self, n_rows, n_columns):
         self.n_rows = n_rows
