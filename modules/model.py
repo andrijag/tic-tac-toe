@@ -30,17 +30,10 @@ class Vector(list):
 
 
 class Board:
-    def __init__(self, n_rows, n_columns, connect_n):
+    def __init__(self, n_rows, n_columns):
         self.n_rows = n_rows
         self.n_columns = n_columns
-        self.connect_n = connect_n
         self.board = Matrix(n_rows, n_columns)
-
-        row = (0, 1)
-        column = (1, 0)
-        diagonal = (1, 1)
-        anti_diagonal = (-1, 1)
-        self.vectors = (row, column, diagonal, anti_diagonal)
 
     def set(self, i, j, value):
         self.board[i][j] = value
@@ -50,16 +43,30 @@ class Board:
             for j in range(self.n_columns):
                 self.board[i][j] = 0
 
+
+class Checker:
+    def __init__(self, board, connect_n):
+        self.board = board
+        self.connect_n = connect_n
+        row = (0, 1)
+        column = (1, 0)
+        diagonal = (a + b for a, b in zip(row, column))
+        anti_diagonal = (a - b for a, b in zip(row, column))
+        self.vectors = (row, column, diagonal, anti_diagonal)
+
     def count_consecutive(self, i, j, di, dj):
         prev = self.board[i][j]
         i, j = i + di, j + dj
-        if 0 <= i < self.n_rows and 0 <= j < self.n_columns and self.board[i][j] == prev:
+        if (0 <= i < self.board.n_rows and
+            0 <= j < self.board.n_columns and
+            self.board[i][j] == prev):
             return 1 + self.count_consecutive(i, j, di, dj)
         return 0
 
     def check_direction(self, i, j, di, dj):
-        return 1 + self.count_consecutive(i, j, di, dj) \
-            + self.count_consecutive(i, j, -di, -dj) == self.connect_n
+        direction = self.count_consecutive(i, j, di, dj)
+        opposite_direction = self.count_consecutive(i, j, -di, -dj)
+        return 1 + direction + opposite_direction == self.connect_n
 
     def check(self, i, j):
         for vector in self.vectors:
@@ -90,11 +97,8 @@ class Game:
         n_players = 2
         self.players = Players(n_players)
         self.player = self.players.next_player()
-        self.board = Board(n_rows, n_columns, connect_n)
+        self.board = Board(n_rows, n_columns)
+        self.checker = Checker(self.board, connect_n)
 
 
 game = Game(N_ROWS, N_COLUMNS, CONNECT_N)
-a = Vector(0, 1)
-b = Vector(1, 0)
-a += b
-print(a)
