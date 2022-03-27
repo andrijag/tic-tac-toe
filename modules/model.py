@@ -23,6 +23,11 @@ class Vector(list):
     def __neg__(self):
         return Vector(*(-a for a in self))
 
+    def __iadd__(self, vector):
+        for i in range(len(self)):
+            self[i] += vector[i]
+        return self
+
 
 class Board:
     def __init__(self, n_rows, n_columns, connect_n):
@@ -89,3 +94,7 @@ class Game:
 
 
 game = Game(N_ROWS, N_COLUMNS, CONNECT_N)
+a = Vector(0, 1)
+b = Vector(1, 0)
+a += b
+print(a)
