@@ -1,6 +1,9 @@
 from itertools import cycle
 
-N_PLAYERS = 2
+N_ROWS = 3
+N_COLUMNS = 3
+CONNECT_N = 3
+
 
 class Matrix(list):
     def __init__(self, m, n):
@@ -18,8 +21,7 @@ class Board:
         column = (1, 0)
         diagonal = (1, 1)
         antiDiagonal = (-1, 1)
-        self.vectors = (row, column, diagonal, antiDiagonal) 
-
+        self.vectors = (row, column, diagonal, antiDiagonal)
 
     def set(self, i, j, value):
         self.board[i][j] = value
@@ -57,8 +59,8 @@ class Player:
 
 class Players:
     def __init__(self, n_players):
-        self.players = (Player(i) for i in range(1, n_players + 1))
-        self.iterator = cycle(self.players)
+        players = (Player(i) for i in range(1, n_players + 1))
+        self.iterator = cycle(players)
 
     def nextPlayer(self):
         return next(self.iterator)
@@ -66,13 +68,10 @@ class Players:
 
 class Game:
     def __init__(self, n_rows, n_columns, connect_n):
-        self.players = Players(N_PLAYERS)
+        n_players = 2
+        self.players = Players(n_players)
         self.player = self.players.nextPlayer()
         self.board = Board(n_rows, n_columns, connect_n)
 
 
-n_rows = 3
-n_columns = 3
-connect_n = 3
-
-game = Game(n_rows, n_columns, connect_n)
+game = Game(N_ROWS, N_COLUMNS, CONNECT_N)
