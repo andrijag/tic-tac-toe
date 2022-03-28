@@ -16,6 +16,9 @@ class Board:
         self.n_columns = n_columns
         self.board = Matrix(n_rows, n_columns)
 
+    def get(self, i, j):
+        return self.board[i][j]
+
     def set(self, i, j, value):
         self.board[i][j] = value
 
@@ -36,23 +39,23 @@ class Checker:
         self.vectors = (row, column, diagonal, anti_diagonal)
 
     def count_consecutive(self, i, j, di, dj, depth):
-        prev = self.board[i][j]
+        prev = self.board.get(i, j)
         i, j = i + di, j + dj
         if (0 <= i < self.board.n_rows and
             0 <= j < self.board.n_columns and
             depth < self.connect_n and
-            self.board[i][j] == prev):
+            self.board.get(i, j) == prev):
             return 1 + self.count_consecutive(i, j, di, dj, depth + 1)
         return 0
 
-    def count_direction(self, i, j, di, dj):
+    def count_in_direction(self, i, j, di, dj):
         direction = self.count_consecutive(i, j, di, dj, 0)
         opposite_direction = self.count_consecutive(i, j, -di, -dj, 0)
         return 1 + direction + opposite_direction
 
     def check(self, i, j):
         for vector in self.vectors:
-            if self.count_direction(i, j, *vector) >= self.connect_n:
+            if self.count_in_direction(i, j, *vector) >= self.connect_n:
                 return True
 
 
