@@ -16,10 +16,12 @@ class Board:
         self.n_columns = n_columns
         self.board = Matrix(n_rows, n_columns)
 
-    def get(self, i, j):
+    def get(self, point):
+        i, j = point
         return self.board[i][j]
 
-    def set(self, i, j, value):
+    def set(self, point, value):
+        i, j = point
         self.board[i][j] = value
 
     def reset(self):
@@ -34,27 +36,30 @@ class Checker:
         self.connect_n = connect_n
         row = (0, 1)
         column = (1, 0)
-        diagonal = (a + b for a, b in zip(row, column))
-        anti_diagonal = (a - b for a, b in zip(row, column))
+        diagonal = tuple(a + b for a, b in zip(row, column))
+        anti_diagonal = tuple(a - b for a, b in zip(row, column))
         self.vectors = (row, column, diagonal, anti_diagonal)
 
-    def count_consecutive(self, i, j, di, dj):
-        prev = self.board.get(i, j)
-        i, j = i + di, j + dj
+    def count_consecutive(self, point, vector):
+        prev = self.board.get(point)
+        new_point = tuple(a + b for a, b in zip(point, vector))
+        i, j = new_point
         if (0 <= i < self.board.n_rows and
             0 <= j < self.board.n_columns and
-            self.board.get(i, j) == prev):
-            return 1 + self.count_consecutive(i, j, di, dj)
+            self.board.get(new_point) == prev):
+            return 1 + self.count_consecutive(new_point, vector)
         return 0
 
-    def count_in_direction(self, i, j, di, dj):
-        direction = self.count_consecutive(i, j, di, dj)
-        opposite_direction = self.count_consecutive(i, j, -di, -dj)
+    def count_in_direction(self, point, vector):
+        neg_vector = tuple(-a for a in vector)
+        direction = self.count_consecutive(point, vector)
+        opposite_direction = self.count_consecutive(point, neg_vector)
+        print(1 + direction + opposite_direction)
         return 1 + direction + opposite_direction
 
-    def check(self, i, j):
+    def check(self, point):
         for vector in self.vectors:
-            if self.count_in_direction(i, j, *vector) >= self.connect_n:
+            if self.count_in_direction(point, vector) >= self.connect_n:
                 return True
 
 
@@ -63,8 +68,8 @@ class Player:
         self.player_n = player_n
         self.score = 0
 
-    def tick(self, board, i, j):
-        board.set(i, j, self.player_n)
+    def tick(self, board, point):
+        board.set(point, self.player_n)
 
 
 class Players:
