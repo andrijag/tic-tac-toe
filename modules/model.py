@@ -34,8 +34,8 @@ class Checker:
         self.connect_n = connect_n
         row = (0, 1)
         column = (1, 0)
-        diagonal = (a + b for a, b in zip(row, column))
-        anti_diagonal = (a - b for a, b in zip(row, column))
+        diagonal = (1, 1)
+        anti_diagonal = (-1, 1)
         self.vectors = (row, column, diagonal, anti_diagonal)
 
     def count_consecutive(self, i, j, di, dj):
