@@ -40,11 +40,11 @@ class Checker:
 
     def count_consecutive(self, i, j, di, dj):
         prev = self.board.get(i, j)
-        new_i, new_j = i + di, j + dj
-        if (0 <= new_i < self.board.n_rows and
-            0 <= new_j < self.board.n_columns and
-            self.board.get(new_i, new_j) == prev):
-            return 1 + self.count_consecutive(new_i, new_j, di, dj)
+        i, j = i + di, j + dj
+        if (0 <= i < self.board.n_rows and
+            0 <= j < self.board.n_columns and
+                self.board.get(i, j) == prev):
+            return 1 + self.count_consecutive(i, j, di, dj)
         return 0
 
     def count_in_direction(self, i, j, di, dj):
