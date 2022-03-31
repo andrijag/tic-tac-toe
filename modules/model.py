@@ -43,7 +43,7 @@ class Checker:
         i, j = i + di, j + dj
         if (0 <= i < self.board.n_rows and
             0 <= j < self.board.n_columns and
-                self.board.get(i, j) == prev):
+            self.board.get(i, j) == prev):
             return 1 + self.count_consecutive(i, j, di, dj)
         return 0
 
@@ -69,11 +69,14 @@ class Player:
 
 class Players:
     def __init__(self, n_players):
-        players = (Player(i) for i in range(1, n_players + 1))
-        self.iterator = cycle(players)
+        self.players = (Player(i) for i in range(1, n_players + 1))
+        self.iterator = cycle(self.players)
 
     def next_player(self):
         return next(self.iterator)
+
+    def reset(self):
+        self.iterator = cycle(self.players)
 
 
 class Game:
@@ -86,9 +89,6 @@ class Game:
 
     def next_turn(self):
         self.player = self.players.next_player()
-
-    def is_over(self):
-        pass
 
 
 game = Game(N_ROWS, N_COLUMNS, CONNECT_N)
