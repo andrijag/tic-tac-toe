@@ -40,11 +40,11 @@ class Checker:
 
     def count_consecutive(self, i, j, di, dj):
         prev = self.board.get(i, j)
-        i, j = i + di, j + dj
-        if (0 <= i < self.board.n_rows and
-            0 <= j < self.board.n_columns and
-            self.board.get(i, j) == prev):
-            return 1 + self.count_consecutive(i, j, di, dj)
+        new_i, new_j = i + di, j + dj
+        if (0 <= new_i < self.board.n_rows and
+            0 <= new_j < self.board.n_columns and
+            self.board.get(new_i, new_j) == prev):
+            return 1 + self.count_consecutive(new_i, new_j, di, dj)
         return 0
 
     def count_in_direction(self, i, j, di, dj):
@@ -53,8 +53,8 @@ class Checker:
         return 1 + direction + opposite_direction
 
     def check(self, i, j):
-        for vector in self.vectors:
-            if self.count_in_direction(i, j, *vector) >= self.connect_n:
+        for di, dj in self.vectors:
+            if self.count_in_direction(i, j, di, dj) >= self.connect_n:
                 return True
 
 
@@ -83,6 +83,12 @@ class Game:
         self.player = self.players.next_player()
         self.board = Board(n_rows, n_columns)
         self.checker = Checker(self.board, connect_n)
+
+    def next_turn(self):
+        self.player = self.players.next_player()
+
+    def is_over(self):
+        pass
 
 
 game = Game(N_ROWS, N_COLUMNS, CONNECT_N)
