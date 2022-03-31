@@ -69,7 +69,7 @@ class Player:
 
 class Players:
     def __init__(self, n_players):
-        self.players = (Player(i) for i in range(1, n_players + 1))
+        self.players = [Player(i) for i in range(1, n_players + 1)]
         self.iterator = cycle(self.players)
 
     def next_player(self):
@@ -89,6 +89,22 @@ class Game:
 
     def next_turn(self):
         self.player = self.players.next_player()
+
+    def reset(self):
+        self.players.reset()
+        self.player = self.players.next_player()
+        self.board.reset()
+
+    def is_over(self):
+        self.player.score += 1
+        self.reset()
+
+    def tick(self, i, j):
+        self.player.tick(self.board, i, j)
+        if self.checker.check(i, j):
+            self.is_over()
+        else:
+            self.next_turn()
 
 
 game = Game(N_ROWS, N_COLUMNS, CONNECT_N)
