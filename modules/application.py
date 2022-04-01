@@ -2,14 +2,17 @@ import tkinter as tk
 from tkinter import ttk
 from .view import View
 from .model import Game
-from .constants import N_ROWS, N_COLUMNS, CONNECT_N
+
+N_ROWS = 3
+N_COLUMNS = 3
+CONNECT_N = 3
 
 
 class Application(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title('TicTacToe')
-        #self.geometry('200x200')
+        # self.geometry('200x200')
         #self.resizable(width=False, height=False)
 
         view = View(self)
