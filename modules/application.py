@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 from .view import View
+from .model import Game
+from .constants import N_ROWS, N_COLUMNS, CONNECT_N
 
 
 class Application(tk.Tk):
@@ -14,3 +16,5 @@ class Application(tk.Tk):
         view.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
+
+        game = Game(N_ROWS, N_COLUMNS, CONNECT_N)
