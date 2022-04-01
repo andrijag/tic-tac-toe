@@ -1,9 +1,5 @@
 from itertools import cycle
 
-N_ROWS = 3
-N_COLUMNS = 3
-CONNECT_N = 3
-
 
 class Matrix(list):
     def __init__(self, m, n):
@@ -105,6 +101,3 @@ class Game:
             self.is_over()
         else:
             self.next_turn()
-
-
-game = Game(N_ROWS, N_COLUMNS, CONNECT_N)
