@@ -1,3 +1,0 @@
-N_ROWS = 3
-N_COLUMNS = 3
-CONNECT_N = 3
