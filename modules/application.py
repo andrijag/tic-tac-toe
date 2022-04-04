@@ -11,9 +11,9 @@ CONNECT_N = 3
 class Application(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title('TicTacToe')
+        self.title("TicTacToe")
         # self.geometry('200x200')
-        #self.resizable(width=False, height=False)
+        # self.resizable(width=False, height=False)
 
         view = View(self)
         view.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
