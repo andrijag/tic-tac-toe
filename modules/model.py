@@ -95,7 +95,6 @@ class Game:
 
     def is_over(self):
         self.player.score += 1
-        self.reset()
 
     def tick(self, i, j):
         self.player.tick(self.board, i, j)
