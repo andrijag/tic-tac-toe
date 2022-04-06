@@ -34,7 +34,7 @@ class Checker:
         anti_diagonal = (-1, 1)
         self.vectors = (row, column, diagonal, anti_diagonal)
 
-    def count_consecutive(self, i, j, di, dj):
+    def _count_consecutive(self, i, j, di, dj):
         prev = self.board.get(i, j)
         i, j = i + di, j + dj
         if (
@@ -42,17 +42,17 @@ class Checker:
             and 0 <= j < self.board.n_columns
             and self.board.get(i, j) == prev
         ):
-            return 1 + self.count_consecutive(i, j, di, dj)
+            return 1 + self._count_consecutive(i, j, di, dj)
         return 0
 
-    def count_in_direction(self, i, j, di, dj):
-        direction = self.count_consecutive(i, j, di, dj)
-        opposite_direction = self.count_consecutive(i, j, -di, -dj)
+    def _count_in_direction(self, i, j, di, dj):
+        direction = self._count_consecutive(i, j, di, dj)
+        opposite_direction = self._count_consecutive(i, j, -di, -dj)
         return 1 + direction + opposite_direction
 
     def check(self, i, j):
         for di, dj in self.vectors:
-            if self.count_in_direction(i, j, di, dj) >= self.connect_n:
+            if self._count_in_direction(i, j, di, dj) >= self.connect_n:
                 return True
 
 
@@ -84,21 +84,25 @@ class Game:
         self.player = self.players.next_player()
         self.board = Board(n_rows, n_columns)
         self.checker = Checker(self.board, connect_n)
+        self.game_over = False
 
-    def next_turn(self):
+    def _next_turn(self):
         self.player = self.players.next_player()
 
     def reset(self):
         self.players.reset()
         self.player = self.players.next_player()
         self.board.reset()
+        self.game_over = False
 
-    def is_over(self):
+    def _end_game(self):
+        self.game_over = True
         self.player.score += 1
 
     def tick(self, i, j):
-        self.player.tick(self.board, i, j)
-        if self.checker.check(i, j):
-            self.is_over()
-        else:
-            self.next_turn()
+        if not self.game_over and not self.board.get(i, j):
+            self.player.tick(self.board, i, j)
+            if self.checker.check(i, j):
+                self._end_game()
+            else:
+                self._next_turn()
