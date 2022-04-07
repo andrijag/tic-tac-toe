@@ -84,25 +84,53 @@ class Game:
         self.player = self.players.next_player()
         self.board = Board(n_rows, n_columns)
         self.checker = Checker(self.board, connect_n)
-        self.game_over = False
+        self.game_ended = False
+        self.controller = None
 
-    def __next_turn(self):
-        self.player = self.players.next_player()
+    def set_controller(self, controller):
+        self.controller = controller
 
-    def reset(self):
+    def reset_board(self):
+        self.board.reset()
+        if self.controller:
+            self.controller.reset_board()
+
+    def reset_players(self):
         self.players.reset()
         self.player = self.players.next_player()
-        self.board.reset()
-        self.game_over = False
 
-    def __end_game(self):
-        self.game_over = True
+    def restart(self):
+        self.reset_players()
+        self.reset_board()
+        self.game_ended = False
+
+    def next_turn(self):
+        self.player = self.players.next_player()
+
+    def update_score(self):
         self.player.score += 1
+        if self.controller:
+            self.controller.update_score()
+
+    def end_game(self):
+        self.game_ended = True
+        self.update_score()
+
+    def game_over(self, i, j):
+        return self.checker.check(i, j)
 
     def tick(self, i, j):
-        if not self.game_over and not self.board.get(i, j):
-            self.player.tick(self.board, i, j)
-            if self.checker.check(i, j):
-                self.__end_game()
+        self.player.tick(self.board, i, j)
+        if self.controller:
+            self.controller.set_button(i, j)
+
+    def legal_move(self, i, j):
+        return not self.game_ended and not self.board.get(i, j)
+
+    def set(self, i, j):
+        if self.legal_move(i, j):
+            self.tick(i, j)
+            if self.game_over(i, j):
+                self.end_game()
             else:
-                self.__next_turn()
+                self.next_turn()
