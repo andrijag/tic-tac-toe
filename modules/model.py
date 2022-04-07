@@ -34,7 +34,7 @@ class Checker:
         anti_diagonal = (-1, 1)
         self.vectors = (row, column, diagonal, anti_diagonal)
 
-    def __count_consecutive(self, i, j, di, dj):
+    def _count_consecutive(self, i, j, di, dj):
         prev = self.board.get(i, j)
         i, j = i + di, j + dj
         if (
@@ -42,17 +42,17 @@ class Checker:
             and 0 <= j < self.board.n_columns
             and self.board.get(i, j) == prev
         ):
-            return 1 + self.__count_consecutive(i, j, di, dj)
+            return 1 + self._count_consecutive(i, j, di, dj)
         return 0
 
-    def __count_in_direction(self, i, j, di, dj):
-        direction = self.__count_consecutive(i, j, di, dj)
-        opposite_direction = self.__count_consecutive(i, j, -di, -dj)
+    def _count_in_direction(self, i, j, di, dj):
+        direction = self._count_consecutive(i, j, di, dj)
+        opposite_direction = self._count_consecutive(i, j, -di, -dj)
         return 1 + direction + opposite_direction
 
     def check(self, i, j):
         for di, dj in self.vectors:
-            if self.__count_in_direction(i, j, di, dj) >= self.connect_n:
+            if self._count_in_direction(i, j, di, dj) >= self.connect_n:
                 return True
 
 
@@ -68,10 +68,10 @@ class Player:
 class Players:
     def __init__(self, n_players):
         self.players = [Player(i) for i in range(1, n_players + 1)]
-        self.iterator = cycle(self.players)
+        self._iterator = cycle(self.players)
 
     def next_player(self):
-        return next(self.iterator)
+        return next(self._iterator)
 
     def reset(self):
         self.iterator = cycle(self.players)
@@ -90,47 +90,47 @@ class Game:
     def set_controller(self, controller):
         self.controller = controller
 
-    def reset_board(self):
+    def _reset_board(self):
         self.board.reset()
         if self.controller:
             self.controller.reset_board()
 
-    def reset_players(self):
+    def _reset_players(self):
         self.players.reset()
         self.player = self.players.next_player()
 
     def restart(self):
-        self.reset_players()
-        self.reset_board()
+        self._reset_players()
+        self._reset_board()
         self.game_ended = False
 
-    def next_turn(self):
+    def _next_turn(self):
         self.player = self.players.next_player()
 
-    def update_score(self):
+    def _update_score(self):
         self.player.score += 1
         if self.controller:
             self.controller.update_score()
 
-    def end_game(self):
+    def _end_game(self):
         self.game_ended = True
-        self.update_score()
+        self._update_score()
 
-    def game_over(self, i, j):
+    def _game_over(self, i, j):
         return self.checker.check(i, j)
 
-    def tick(self, i, j):
+    def _tick(self, i, j):
         self.player.tick(self.board, i, j)
         if self.controller:
             self.controller.set_button(i, j)
 
-    def legal_move(self, i, j):
+    def _legal_move(self, i, j):
         return not self.game_ended and not self.board.get(i, j)
 
     def set(self, i, j):
-        if self.legal_move(i, j):
-            self.tick(i, j)
-            if self.game_over(i, j):
-                self.end_game()
+        if self._legal_move(i, j):
+            self._tick(i, j)
+            if self._game_over(i, j):
+                self._end_game()
             else:
-                self.next_turn()
+                self._next_turn()
