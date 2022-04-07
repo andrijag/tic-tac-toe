@@ -34,7 +34,7 @@ class Checker:
         anti_diagonal = (-1, 1)
         self.vectors = (row, column, diagonal, anti_diagonal)
 
-    def _count_consecutive(self, i, j, di, dj):
+    def __count_consecutive(self, i, j, di, dj):
         prev = self.board.get(i, j)
         i, j = i + di, j + dj
         if (
@@ -42,17 +42,17 @@ class Checker:
             and 0 <= j < self.board.n_columns
             and self.board.get(i, j) == prev
         ):
-            return 1 + self._count_consecutive(i, j, di, dj)
+            return 1 + self.__count_consecutive(i, j, di, dj)
         return 0
 
-    def _count_in_direction(self, i, j, di, dj):
-        direction = self._count_consecutive(i, j, di, dj)
-        opposite_direction = self._count_consecutive(i, j, -di, -dj)
+    def __count_in_direction(self, i, j, di, dj):
+        direction = self.__count_consecutive(i, j, di, dj)
+        opposite_direction = self.__count_consecutive(i, j, -di, -dj)
         return 1 + direction + opposite_direction
 
     def check(self, i, j):
         for di, dj in self.vectors:
-            if self._count_in_direction(i, j, di, dj) >= self.connect_n:
+            if self.__count_in_direction(i, j, di, dj) >= self.connect_n:
                 return True
 
 
@@ -86,7 +86,7 @@ class Game:
         self.checker = Checker(self.board, connect_n)
         self.game_over = False
 
-    def _next_turn(self):
+    def __next_turn(self):
         self.player = self.players.next_player()
 
     def reset(self):
@@ -95,7 +95,7 @@ class Game:
         self.board.reset()
         self.game_over = False
 
-    def _end_game(self):
+    def __end_game(self):
         self.game_over = True
         self.player.score += 1
 
@@ -103,6 +103,6 @@ class Game:
         if not self.game_over and not self.board.get(i, j):
             self.player.tick(self.board, i, j)
             if self.checker.check(i, j):
-                self._end_game()
+                self.__end_game()
             else:
-                self._next_turn()
+                self.__next_turn()
