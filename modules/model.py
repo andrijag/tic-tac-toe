@@ -74,7 +74,7 @@ class Players:
         return next(self._iterator)
 
     def reset(self):
-        self.iterator = cycle(self.players)
+        self._iterator = cycle(self.players)
 
 
 class Game:
@@ -86,9 +86,6 @@ class Game:
         self.checker = Checker(self.board, connect_n)
         self.game_ended = False
         self.controller = None
-
-    def set_controller(self, controller):
-        self.controller = controller
 
     def _reset_board(self):
         self.board.reset()
@@ -119,7 +116,7 @@ class Game:
     def _game_over(self, i, j):
         return self.checker.check(i, j)
 
-    def _tick(self, i, j):
+    def _player_tick(self, i, j):
         self.player.tick(self.board, i, j)
         if self.controller:
             self.controller.set_button(i, j)
@@ -127,9 +124,9 @@ class Game:
     def _legal_move(self, i, j):
         return not self.game_ended and not self.board.get(i, j)
 
-    def set(self, i, j):
+    def tick(self, i, j):
         if self._legal_move(i, j):
-            self._tick(i, j)
+            self._player_tick(i, j)
             if self._game_over(i, j):
                 self._end_game()
             else:
