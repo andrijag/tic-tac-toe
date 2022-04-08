@@ -77,7 +77,12 @@ class Players:
         self._iterator = cycle(self.players)
 
 
-class Game:
+class Subject:
+    def notify_observers(self):
+        raise NotImplementedError
+
+
+class Game(Subject):
     def __init__(self, n_rows, n_columns, connect_n):
         n_players = 2
         self.players = Players(n_players)
