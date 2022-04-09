@@ -89,36 +89,41 @@ class Game(Subject):
         self.player = self.players.next_player()
         self.board = Board(n_rows, n_columns)
         self.checker = Checker(self.board, connect_n)
-        self.game_ended = False
+        self.game_over = False
         self.observers = []
 
-    def notify_observers(self):
+    def _notify_observers(self):
         for observer in self.observers:
             observer.notify()
 
-    def restart(self):
+    def _reset_players(self):
         self.players.reset()
         self.player = self.players.next_player()
+
+    def restart(self):
+        self._reset_players()
         self.board.reset()
-        self.game_ended = False
+        self.game_over = False
+        self._notify_observers()
 
     def _next_turn(self):
         self.player = self.players.next_player()
 
     def _end_game(self):
-        self.game_ended = True
+        self.game_over = True
         self.player.score += 1
 
-    def _game_over(self, i, j):
+    def _winning_move(self, i, j):
         return self.checker.check(i, j)
 
     def _legal_move(self, i, j):
-        return not self.game_ended and not self.board.get(i, j)
+        return not self.game_over and not self.board.get(i, j)
 
     def tick(self, i, j):
         if self._legal_move(i, j):
             self.player.tick(self.board, i, j)
-            if self._game_over(i, j):
+            if self._winning_move(i, j):
                 self._end_game()
             else:
                 self._next_turn()
+            self._notify_observers()
