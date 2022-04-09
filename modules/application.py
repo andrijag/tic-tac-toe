@@ -21,3 +21,4 @@ class Application(tk.Tk):
         self.rowconfigure(0, weight=1)
 
         game = Game(N_ROWS, N_COLUMNS, CONNECT_N)
+        game.attach_observer(view)
