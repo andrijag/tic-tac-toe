@@ -1,4 +1,5 @@
 from itertools import cycle
+from abc import ABC, abstractmethod
 
 
 class Matrix(list):
@@ -10,18 +11,18 @@ class Board:
     def __init__(self, n_rows, n_columns):
         self.n_rows = n_rows
         self.n_columns = n_columns
-        self.board = Matrix(n_rows, n_columns)
+        self._board = Matrix(n_rows, n_columns)
 
     def get(self, i, j):
-        return self.board[i][j]
+        return self._board[i][j]
 
     def set(self, i, j, value):
-        self.board[i][j] = value
+        self._board[i][j] = value
 
     def reset(self):
         for i in range(self.n_rows):
             for j in range(self.n_columns):
-                self.board[i][j] = 0
+                self._board[i][j] = 0
 
 
 class Checker:
@@ -32,7 +33,7 @@ class Checker:
         column = (1, 0)
         diagonal = (1, 1)
         anti_diagonal = (-1, 1)
-        self.vectors = (row, column, diagonal, anti_diagonal)
+        self._vectors = (row, column, diagonal, anti_diagonal)
 
     def _count_consecutive(self, i, j, di, dj):
         prev = self.board.get(i, j)
@@ -51,7 +52,7 @@ class Checker:
         return 1 + direction + opposite_direction
 
     def check(self, i, j):
-        for di, dj in self.vectors:
+        for di, dj in self._vectors:
             if self._count_in_direction(i, j, di, dj) >= self.connect_n:
                 return True
 
@@ -77,9 +78,18 @@ class Players:
         self._iterator = cycle(self.players)
 
 
-class Subject:
+class Subject(ABC):
+    @abstractmethod
+    def attach_observer(self, observer):
+        pass
+
+    @abstractmethod
+    def detach_observer(self, observer):
+        pass
+
+    @abstractmethod
     def notify_observers(self):
-        raise NotImplementedError
+        pass
 
 
 class Game(Subject):
@@ -92,19 +102,22 @@ class Game(Subject):
         self.game_over = False
         self.observers = []
 
-    def _notify_observers(self):
-        for observer in self.observers:
-            observer.notify()
+    def attach_observer(self, observer):
+        self.observers.append(observer)
 
-    def _reset_players(self):
-        self.players.reset()
-        self.player = self.players.next_player()
+    def detach_observer(self, observer):
+        self.observers.remove(observer)
+
+    def notify_observers(self):
+        for observer in self.observers:
+            observer.update()
 
     def restart(self):
-        self._reset_players()
+        self.players.reset()
+        self.player = self.players.next_player()
         self.board.reset()
         self.game_over = False
-        self._notify_observers()
+        self.notify_observers()
 
     def _next_turn(self):
         self.player = self.players.next_player()
@@ -126,4 +139,4 @@ class Game(Subject):
                 self._end_game()
             else:
                 self._next_turn()
-            self._notify_observers()
+            self.notify_observers()
