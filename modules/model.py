@@ -68,14 +68,14 @@ class Player:
 
 class Players:
     def __init__(self, n_players):
-        self.players = [Player(i) for i in range(1, n_players + 1)]
-        self._iterator = cycle(self.players)
+        self.collection = [Player(i) for i in range(1, n_players + 1)]
+        self._iterator = cycle(self.collection)
 
     def next_player(self):
         return next(self._iterator)
 
     def reset(self):
-        self._iterator = cycle(self.players)
+        self._iterator = cycle(self.collection)
 
 
 class Subject(ABC):

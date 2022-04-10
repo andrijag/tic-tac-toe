@@ -22,3 +22,14 @@ class Application(tk.Tk):
 
         game = Game(N_ROWS, N_COLUMNS, CONNECT_N)
         game.attach_observer(view)
+
+        # for i in range(N_ROWS):
+        #    for j in range(N_COLUMNS):
+        #        view.board_buttons[i][j].bind(lambda i, j: game.tick(i, j))
+
+        # view.restart_button.bind(game.restart)
+
+        #player_ns = [player.score for player in game.players.collection]
+        #player_n_shape = {
+        #    player_n: view.shapes[i] for i, player_n in enumerate(player_ns)
+        #}
