@@ -23,7 +23,7 @@ class Game(Subject):
         self._iterator = cycle(self.players)
         self._player = next(self._iterator)
         self.board = Board(n_rows, n_columns)
-        self._checker = Checker(self.board, connect_n)
+        self._validator = Validator(self.board, connect_n)
         self._game_over = False
         self._observers = []
 
@@ -50,7 +50,7 @@ class Game(Subject):
         return not self._game_over and not self.board[i][j]
 
     def _winning_move(self, i, j):
-        return self._checker.check(i, j)
+        return self._validator.check(i, j)
 
     def _end_game(self):
         self._game_over = True
@@ -100,7 +100,7 @@ class Board:
                 self._board[i][j] = 0
 
 
-class Checker:
+class Validator:
     def __init__(self, board, connect_n):
         self.board = board
         self.connect_n = connect_n
