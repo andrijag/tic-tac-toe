@@ -2,22 +2,20 @@ from itertools import cycle
 from abc import ABC, abstractmethod
 
 
-class Matrix(list):
-    def __init__(self, m, n):
-        super().__init__([0 for j in range(n)] for i in range(m))
-
-
 class Board:
     def __init__(self, n_rows, n_columns):
+        self._board = [[0 for j in range(n_columns)] for i in range(n_rows)]
         self.n_rows = n_rows
         self.n_columns = n_columns
-        self._board = Matrix(n_rows, n_columns)
 
-    def get(self, i, j):
-        return self._board[i][j]
+    def __getitem__(self, key):
+        return self._board[key]
 
-    def set(self, i, j, value):
-        self._board[i][j] = value
+    def __setitem__(self, key, value):
+        self._board[key] = value
+
+    def __str__(self):
+        return str(self._board)
 
     def reset(self):
         for i in range(self.n_rows):
@@ -29,19 +27,19 @@ class Checker:
     def __init__(self, board, connect_n):
         self.board = board
         self.connect_n = connect_n
-        row = (0, 1)
-        column = (1, 0)
-        diagonal = (1, 1)
-        anti_diagonal = (-1, 1)
-        self._vectors = (row, column, diagonal, anti_diagonal)
+        row = 0, 1
+        column = 1, 0
+        diagonal = 1, 1
+        anti_diagonal = -1, 1
+        self._vectors = row, column, diagonal, anti_diagonal
 
     def _count_consecutive(self, i, j, di, dj):
-        prev = self.board.get(i, j)
+        prev = self.board[i][j]
         i, j = i + di, j + dj
         if (
             0 <= i < self.board.n_rows
             and 0 <= j < self.board.n_columns
-            and self.board.get(i, j) == prev
+            and self.board[i][j] == prev
         ):
             return 1 + self._count_consecutive(i, j, di, dj)
         return 0
@@ -58,24 +56,15 @@ class Checker:
 
 
 class Player:
-    def __init__(self, player_n):
-        self.player_n = player_n
+    def __init__(self, id_):
+        self.id_ = id_
         self.score = 0
 
+    def __str__(self):
+        return f'player {self.id_}'
+
     def tick(self, board, i, j):
-        board.set(i, j, self.player_n)
-
-
-class Players:
-    def __init__(self, n_players):
-        self.collection = [Player(i) for i in range(1, n_players + 1)]
-        self._iterator = cycle(self.collection)
-
-    def next_player(self):
-        return next(self._iterator)
-
-    def reset(self):
-        self._iterator = cycle(self.collection)
+        board[i][j] = self.id_
 
 
 class Subject(ABC):
@@ -95,10 +84,11 @@ class Subject(ABC):
 class Game(Subject):
     def __init__(self, n_rows, n_columns, connect_n):
         n_players = 2
-        self.players = Players(n_players)
-        self.player = self.players.next_player()
+        self.players = [Player(i) for i in range(1, n_players + 1)]
+        self._players_iter = cycle(self.players)
+        self.player = next(self._players_iter)
         self.board = Board(n_rows, n_columns)
-        self.checker = Checker(self.board, connect_n)
+        self._checker = Checker(self.board, connect_n)
         self.game_over = False
         self.observers = []
 
@@ -113,24 +103,24 @@ class Game(Subject):
             observer.update()
 
     def restart(self):
-        self.players.reset()
-        self.player = self.players.next_player()
+        self._players_iter = cycle(self.players)
+        self.player = next(self._players_iter)
         self.board.reset()
         self.game_over = False
         self.notify_observers()
 
     def _next_turn(self):
-        self.player = self.players.next_player()
+        self.player = next(self._players_iter)
 
     def _end_game(self):
         self.game_over = True
         self.player.score += 1
 
     def _winning_move(self, i, j):
-        return self.checker.check(i, j)
+        return self._checker.check(i, j)
 
     def _legal_move(self, i, j):
-        return not self.game_over and not self.board.get(i, j)
+        return not self.game_over and not self.board[i][j]
 
     def tick(self, i, j):
         if self._legal_move(i, j):
