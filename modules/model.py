@@ -61,7 +61,7 @@ class Player:
         self.score = 0
 
     def __str__(self):
-        return f'player {self.id_}'
+        return f"player {self.id_}"
 
     def tick(self, board, i, j):
         board[i][j] = self.id_

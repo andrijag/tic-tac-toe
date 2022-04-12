@@ -29,7 +29,12 @@ class Application(tk.Tk):
 
         # view.restart_button.bind(game.restart)
 
-        #player_ns = [player.score for player in game.players.collection]
-        #player_n_shape = {
-        #    player_n: view.shapes[i] for i, player_n in enumerate(player_ns)
-        #}
+        view.shapes.append("x")
+        view.shapes.append("o")
+
+        id_s = [player.id_ for player in game.players]
+        player_shape = {id_: view.shapes[i] for i, id_ in enumerate(id_s)}
+
+        player_shape = {
+            player.id_: view.shapes[i] for i, player in enumerate(game.players)
+        }
