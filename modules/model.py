@@ -33,6 +33,16 @@ class Checker:
         anti_diagonal = -1, 1
         self._vectors = row, column, diagonal, anti_diagonal
 
+    def check(self, i, j):
+        for di, dj in self._vectors:
+            if self._count_in_direction(i, j, di, dj) >= self.connect_n:
+                return True
+
+    def _count_in_direction(self, i, j, di, dj):
+        direction = self._count_consecutive(i, j, di, dj)
+        opposite_direction = self._count_consecutive(i, j, -di, -dj)
+        return 1 + direction + opposite_direction
+
     def _count_consecutive(self, i, j, di, dj):
         prev = self.board[i][j]
         i, j = i + di, j + dj
@@ -43,16 +53,6 @@ class Checker:
         ):
             return 1 + self._count_consecutive(i, j, di, dj)
         return 0
-
-    def _count_in_direction(self, i, j, di, dj):
-        direction = self._count_consecutive(i, j, di, dj)
-        opposite_direction = self._count_consecutive(i, j, -di, -dj)
-        return 1 + direction + opposite_direction
-
-    def check(self, i, j):
-        for di, dj in self._vectors:
-            if self._count_in_direction(i, j, di, dj) >= self.connect_n:
-                return True
 
 
 class Player:
@@ -102,26 +102,6 @@ class Game(Subject):
         for observer in self.observers:
             observer.update()
 
-    def restart(self):
-        self._players_iter = cycle(self.players)
-        self.player = next(self._players_iter)
-        self.board.reset()
-        self.game_over = False
-        self.notify_observers()
-
-    def _next_turn(self):
-        self.player = next(self._players_iter)
-
-    def _end_game(self):
-        self.game_over = True
-        self.player.score += 1
-
-    def _winning_move(self, i, j):
-        return self._checker.check(i, j)
-
-    def _legal_move(self, i, j):
-        return not self.game_over and not self.board[i][j]
-
     def tick(self, i, j):
         if self._legal_move(i, j):
             self.player.tick(self.board, i, j)
@@ -130,3 +110,23 @@ class Game(Subject):
             else:
                 self._next_turn()
             self.notify_observers()
+
+    def _legal_move(self, i, j):
+        return not self.game_over and not self.board[i][j]
+
+    def _winning_move(self, i, j):
+        return self._checker.check(i, j)
+
+    def _end_game(self):
+        self.game_over = True
+        self.player.score += 1
+
+    def _next_turn(self):
+        self.player = next(self._players_iter)
+
+    def restart(self):
+        self._players_iter = cycle(self.players)
+        self.player = next(self._players_iter)
+        self.board.reset()
+        self.game_over = False
+        self.notify_observers()
