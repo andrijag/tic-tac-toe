@@ -20,8 +20,8 @@ class Game(Subject):
     def __init__(self, n_rows, n_columns, connect_n):
         n_players = 2
         self.players = [Player(i) for i in range(1, n_players + 1)]
-        self._players_iter = cycle(self.players)
-        self._player = next(self._players_iter)
+        self._iterator = cycle(self.players)
+        self._player = next(self._iterator)
         self.board = Board(n_rows, n_columns)
         self._checker = Checker(self.board, connect_n)
         self._game_over = False
@@ -57,11 +57,11 @@ class Game(Subject):
         self._player.score += 1
 
     def _next_turn(self):
-        self._player = next(self._players_iter)
+        self._player = next(self._iterator)
 
     def restart(self):
-        self._players_iter = cycle(self.players)
-        self._player = next(self._players_iter)
+        self._iterator = cycle(self.players)
+        self._player = next(self._iterator)
         self.board.reset()
         self._game_over = False
         self.notify_observers()
