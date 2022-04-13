@@ -32,9 +32,7 @@ class Application(tk.Tk):
         view.shapes.append("x")
         view.shapes.append("o")
 
-        id_s = [player.id_ for player in game.players]
-        player_shape = {id_: view.shapes[i] for i, id_ in enumerate(id_s)}
-
         player_shape = {
             player.id_: view.shapes[i] for i, player in enumerate(game.players)
         }
+        print(player_shape)
