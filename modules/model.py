@@ -118,15 +118,13 @@ class Validator:
     def _count_in_direction(self, i, j, di, dj):
         direction = self._count_consecutive(i, j, di, dj)
         opposite_direction = self._count_consecutive(i, j, -di, -dj)
-        return 1 + direction + opposite_direction
+        return direction + opposite_direction - 1
 
     def _count_consecutive(self, i, j, di, dj):
-        prev = self.board[i][j]
-        i, j = i + di, j + dj
         if (
-            0 <= i < self.board.n_rows
-            and 0 <= j < self.board.n_columns
-            and self.board[i][j] == prev
+            i + di in range(self.board.n_rows)
+            and j + dj in range(self.board.n_columns)
+            and self.board[i][j] == self.board[i + di][j + dj]
         ):
-            return 1 + self._count_consecutive(i, j, di, dj)
-        return 0
+            return 1 + self._count_consecutive(i + di, j + dj, di, dj)
+        return 1
