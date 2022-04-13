@@ -35,4 +35,3 @@ class Application(tk.Tk):
         player_shape = {
             player.id_: view.shapes[i] for i, player in enumerate(game.players)
         }
-        print(player_shape)
