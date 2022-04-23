@@ -81,7 +81,7 @@ class Player:
 
 class Board:
     def __init__(self, n_rows, n_columns):
-        self._board = [[0 for j in range(n_columns)] for i in range(n_rows)]
+        self._board = [[0 for _ in range(n_columns)] for _ in range(n_rows)]
         self.n_rows = n_rows
         self.n_columns = n_columns
 
@@ -122,9 +122,9 @@ class Validator:
 
     def _count_consecutive(self, i, j, di, dj):
         if (
-            i + di in range(self.board.n_rows)
-            and j + dj in range(self.board.n_columns)
-            and self.board[i][j] == self.board[i + di][j + dj]
+                i + di in range(self.board.n_rows)
+                and j + dj in range(self.board.n_columns)
+                and self.board[i][j] == self.board[i + di][j + dj]
         ):
             return 1 + self._count_consecutive(i + di, j + dj, di, dj)
         return 1

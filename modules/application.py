@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import ttk
 from .view import View
 from .model import Game
 
@@ -16,7 +15,7 @@ class Application(tk.Tk):
         # self.resizable(width=False, height=False)
 
         view = View(self)
-        view.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
+        view.grid(column=0, row=0, sticky="n e s w")
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
