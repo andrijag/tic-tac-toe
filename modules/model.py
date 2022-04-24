@@ -104,14 +104,15 @@ class Validator:
     def __init__(self, board, connect_n):
         self.board = board
         self.connect_n = connect_n
-        row = 0, 1
-        column = 1, 0
-        diagonal = 1, 1
-        anti_diagonal = -1, 1
-        self._vectors = row, column, diagonal, anti_diagonal
+        self._vectors = {
+            "row": (0, 1),
+            "column": (1, 0),
+            "diagonal": (1, 1),
+            "anti-diagonal": (-1, 1),
+        }
 
     def check(self, i, j):
-        for di, dj in self._vectors:
+        for di, dj in self._vectors.values():
             if self._count_in_direction(i, j, di, dj) >= self.connect_n:
                 return True
 
