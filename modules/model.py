@@ -105,8 +105,8 @@ class Validator:
         self.board = board
         self.connect_n = connect_n
         self._vectors = {
-            "row": (0, 1),
-            "column": (1, 0),
+            "horizontal": (0, 1),
+            "vertical": (1, 0),
             "diagonal": (1, 1),
             "anti-diagonal": (-1, 1),
         }
