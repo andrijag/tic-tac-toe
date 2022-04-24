@@ -10,10 +10,13 @@ class Observer(ABC):
 
 
 class View(ttk.Frame, Observer):
-    def __init__(self, parent):
+    def __init__(self, parent, n_rows, n_columns):
         super().__init__(parent)
 
-        self.shapes = []
+        self.shapes = ["x", "o"]
 
         canvas = tk.Canvas(parent, width=300, height=300, background="white")
         canvas.grid()
+
+        self.restart_button = ttk.Button(parent, text="Restart")
+        self.restart_button.grid()
