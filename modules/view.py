@@ -19,15 +19,20 @@ class View(ttk.Frame, Observer):
         self.score = ttk.Label(parent, text="TODO")
         self.score.grid()
 
-        self.board = ttk.Frame(parent, width=100, height=100)
-        self._board = [[Space(self.board) for j in range(n_columns)] for i in range(n_rows)]
-        for i in range(n_rows):
-            for j in range(n_columns):
-                self._board[i][j].grid(column=i, row=j)
+        self.board = BoardView(parent, n_rows, n_columns)
         self.board.grid()
 
         self.restart_button = ttk.Button(parent, text="Restart")
         self.restart_button.grid()
+
+
+class BoardView(ttk.Frame):
+    def __init__(self, parent, n_rows, n_columns):
+        super().__init__(parent)
+        self._board_view = [[Space(self) for _ in range(n_columns)] for _ in range(n_rows)]
+        for i in range(n_rows):
+            for j in range(n_columns):
+                self._board_view[i][j].grid(column=j, row=i)
 
 
 class Space(tk.Canvas):
