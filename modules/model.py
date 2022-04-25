@@ -35,7 +35,7 @@ class Game(Subject):
 
     def notify_observers(self):
         for observer in self._observers:
-            observer.update()
+            observer.update_()
 
     def tick(self, i, j):
         if self._legal_move(i, j):
