@@ -12,11 +12,12 @@ class Observer(ABC):
 class View(ttk.Frame, Observer):
     def __init__(self, parent, n_rows, n_columns):
         super().__init__(parent)
-
         self.subject = None
         self.shapes = [Cross(), Circle()]
+        self.colors = ["red", "blue"]
+        self.color_player = None
 
-        self.score = ttk.Label(parent, text="TODO")
+        self.score = ttk.Label(parent, text="---")
         self.score.grid()
 
         self.board = BoardView(parent, n_rows, n_columns)
@@ -25,14 +26,32 @@ class View(ttk.Frame, Observer):
         self.restart_button = ttk.Button(parent, text="Restart")
         self.restart_button.grid()
 
+    def update(self):
+        if self.subject:
+            if not self.color_player:
+                self.color_player = {
+                    player.id_: self.colors[i] for i, player in enumerate(self.subject.players)
+                }
+            score = " : ".join(str(player.score) for player in self.subject.players)
+            self.score.configure(text=score)
+            for i in range(self.board.n_rows):
+                for j in range(self.board.n_columns):
+                    if self.subject.board[i][j]:
+                        self.board.spaces[i][j].configure(bg=self.color_player[self.subject.board[i][j]])
+                    else:
+                        self.board.spaces[i][j].configure(bg="white")
+        print("update?")
+
 
 class BoardView(ttk.Frame):
     def __init__(self, parent, n_rows, n_columns):
         super().__init__(parent)
-        self._board_view = [[Space(self) for _ in range(n_columns)] for _ in range(n_rows)]
+        self.n_rows = n_rows
+        self.n_columns = n_columns
+        self.spaces = [[Space(self) for _ in range(n_columns)] for _ in range(n_rows)]
         for i in range(n_rows):
             for j in range(n_columns):
-                self._board_view[i][j].grid(column=j, row=i)
+                self.spaces[i][j].grid(column=j, row=i)
 
 
 class Space(tk.Canvas):

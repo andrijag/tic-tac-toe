@@ -2,8 +2,8 @@ import tkinter as tk
 from .view import View
 from .model import Game
 
-N_ROWS = 3
-N_COLUMNS = 3
+N_ROWS = 6
+N_COLUMNS = 7
 CONNECT_N = 3
 
 
@@ -20,12 +20,13 @@ class Application(tk.Tk):
         self.rowconfigure(0, weight=1)
 
         game = Game(N_ROWS, N_COLUMNS, CONNECT_N)
-        view.subject = game
         game.attach_observer(view)
+        view.subject = game
+        view.update()
 
-        # for i in range(N_ROWS):
-        #    for j in range(N_COLUMNS):
-        #        view.board_buttons[i][j].bind("<Button-1>", lambda i, j: game.tick(i, j))
+        for i in range(N_ROWS):
+            for j in range(N_COLUMNS):
+                view.board.spaces[i][j].bind("<Button-1>", lambda event, x=i, y=j: game.tick(x, y))
 
         view.restart_button.configure(command=game.restart)
 
