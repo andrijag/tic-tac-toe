@@ -10,7 +10,7 @@ CONNECT_N = 3
 class Application(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("TicTacToe")
+        self.title("Tic-tac-toe")
         # self.geometry('200x200')
         # self.resizable(width=False, height=False)
 
@@ -20,6 +20,7 @@ class Application(tk.Tk):
         self.rowconfigure(0, weight=1)
 
         game = Game(N_ROWS, N_COLUMNS, CONNECT_N)
+        view.subject = game
         game.attach_observer(view)
 
         # for i in range(N_ROWS):
