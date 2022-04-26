@@ -18,7 +18,7 @@ class View(ttk.Frame, Observer):
         self.shapes = [Cross(), Circle()]
         self.shape_player = None
 
-        self.colors = ["red", "blue"]
+        self.colors = ["red", "blue", "green"]
         self.color_player = None
 
         self.columnconfigure(0, weight=1)
@@ -55,38 +55,20 @@ class View(ttk.Frame, Observer):
     def update_(self):
         if self.controller:
             self.controller.update()
-        elif self.model:
+        elif self.subject:
             pass
 
-    def _update_(self):
-        if self.subject:
-            if not self.color_player:
-                self.color_player = {
-                    player.id_: self.colors[i]
-                    for i, player in enumerate(self.subject.players)
-                }
-            score = " : ".join(str(player.score) for player in self.subject.players)
-            self.score.configure(text=score)
-            for i in range(self.board.n_rows):
-                for j in range(self.board.n_columns):
-                    if self.subject.board[i][j]:
-                        self.board[i][j].configure(
-                            bg=self.color_player[self.subject.board[i][j]]
-                        )
-                    else:
-                        self.board[i][j].configure(bg="white")
 
-
-class BoardView(tk.Canvas):
+class BoardView(ttk.Frame):
     def __init__(self, parent, n_rows, n_columns):
-        super().__init__(parent, background="black")
+        super().__init__(parent)
         self.n_rows = n_rows
         self.n_columns = n_columns
         self._board = [[Space(self) for _ in range(n_columns)] for _ in range(n_rows)]
 
         for i in range(n_rows):
             for j in range(n_columns):
-                self._board[i][j].grid(column=j, row=i, padx=1, pady=1)
+                self._board[i][j].grid(column=j, row=i)
 
     def __getitem__(self, index):
         return self._board[index]
@@ -94,7 +76,7 @@ class BoardView(tk.Canvas):
 
 class Space(tk.Canvas):
     def __init__(self, parent):
-        super().__init__(parent, width=50, height=50)
+        super().__init__(parent, width=50, height=50, background="white")
 
 
 class Shape(ABC):
