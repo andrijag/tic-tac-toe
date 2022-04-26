@@ -17,8 +17,7 @@ class Subject(ABC):
 
 
 class Game(Subject):
-    def __init__(self, n_rows, n_columns, connect_n):
-        n_players = 2
+    def __init__(self, n_rows, n_columns, connect_n, n_players=2):
         self.players = [Player(i) for i in range(1, n_players + 1)]
         self._iterator = cycle(self.players)
         self._player = next(self._iterator)
