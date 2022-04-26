@@ -44,4 +44,4 @@ class Controller(Strategy):
                         bg=self.color_player[self.model.board[i][j]]
                     )
                 else:
-                    self.view.board[i][j].configure(bg="white")
+                    self.view.board[i][j].configure(bg=self.view.board[i][j].empty_color)

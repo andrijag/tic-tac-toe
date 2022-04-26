@@ -1,12 +1,11 @@
 import tkinter as tk
-
 from .model import Game
 from .view import View
 from .controller import Controller
 
-N_ROWS = 10
-N_COLUMNS = 10
-CONNECT_N = 5
+N_ROWS = 3
+N_COLUMNS = 3
+CONNECT_N = 3
 
 
 class Application(tk.Tk):

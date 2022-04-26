@@ -16,10 +16,7 @@ class View(ttk.Frame, Observer):
         self.controller = None
 
         self.shapes = [Cross(), Circle()]
-        self.shape_player = None
-
         self.colors = ["red", "blue", "green"]
-        self.color_player = None
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -33,42 +30,36 @@ class View(ttk.Frame, Observer):
         for i in range(n_rows):
             for j in range(n_columns):
                 self.board[i][j].bind(
-                    "<Button-1>", lambda event, x=i, y=j: self.tick(x, y)
+                    "<Button-1>", lambda event, x=i, y=j: self._tick(x, y)
                 )
         self.board.grid(column=0, row=1)
 
-        self.restart_button = ttk.Button(self, text="Restart", command=self.restart)
+        self.restart_button = ttk.Button(self, text="Restart", command=self._restart)
         self.restart_button.grid(column=0, row=2)
 
-    def tick(self, i, j):
+    def _tick(self, i, j):
         if self.controller:
             self.controller.tick(i, j)
-        elif self.model:
-            self.model.tick(i, j)
 
-    def restart(self):
+    def _restart(self):
         if self.controller:
             self.controller.restart()
-        elif self.model:
-            self.model.restart()
 
     def update_(self):
         if self.controller:
             self.controller.update()
-        elif self.subject:
-            pass
 
 
-class BoardView(ttk.Frame):
+class BoardView(tk.Canvas):
     def __init__(self, parent, n_rows, n_columns):
-        super().__init__(parent)
+        super().__init__(parent, background="black")
         self.n_rows = n_rows
         self.n_columns = n_columns
         self._board = [[Space(self) for _ in range(n_columns)] for _ in range(n_rows)]
 
         for i in range(n_rows):
             for j in range(n_columns):
-                self._board[i][j].grid(column=j, row=i)
+                self._board[i][j].grid(column=j, row=i, padx=1, pady=1)
 
     def __getitem__(self, index):
         return self._board[index]
@@ -76,7 +67,11 @@ class BoardView(ttk.Frame):
 
 class Space(tk.Canvas):
     def __init__(self, parent):
-        super().__init__(parent, width=50, height=50, background="white")
+        super().__init__(parent, width=50, height=50)
+        self.empty_color = self["background"]
+
+    def update_(self):
+        pass
 
 
 class Shape(ABC):
