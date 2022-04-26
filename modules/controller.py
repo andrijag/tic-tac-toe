@@ -35,4 +35,13 @@ class Controller(Strategy):
             self.model.tick(i, j)
 
     def update(self):
-        pass
+        score = " : ".join(str(player.score) for player in self.model.players)
+        self.view.score.configure(text=score)
+        for i in range(self.model.board.n_rows):
+            for j in range(self.model.board.n_columns):
+                if self.model.board[i][j]:
+                    self.view.board[i][j].configure(
+                        bg=self.color_player[self.model.board[i][j]]
+                    )
+                else:
+                    self.view.board[i][j].configure(bg="white")
