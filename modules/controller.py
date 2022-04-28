@@ -40,8 +40,8 @@ class Controller(Strategy):
         for i in range(self.model.board.n_rows):
             for j in range(self.model.board.n_columns):
                 if self.model.board[i][j]:
-                    self.view.board[i][j].configure(
-                        bg=self.color_player[self.model.board[i][j]]
-                    )
+                    self.view.board.itemconfig(self.view.board_buttons[i][j],
+                                               fill=self.color_player[self.model.board[i][j]])
                 else:
-                    self.view.board[i][j].configure(bg=self.view.board[i][j].empty_color)
+                    self.view.board.itemconfig(self.view.board_buttons[i][j],
+                                               fill="white")

@@ -3,8 +3,8 @@ from .model import Game
 from .view import View
 from .controller import Controller
 
-N_ROWS = 3
-N_COLUMNS = 3
+N_ROWS = 6
+N_COLUMNS = 7
 CONNECT_N = 3
 
 
@@ -12,8 +12,6 @@ class Application(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Tic-tac-toe")
-        # self.geometry('200x200')
-        # self.resizable(width=False, height=False)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 

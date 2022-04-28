@@ -1,5 +1,5 @@
-from itertools import cycle
 from abc import ABC, abstractmethod
+from itertools import cycle
 
 
 class Subject(ABC):
