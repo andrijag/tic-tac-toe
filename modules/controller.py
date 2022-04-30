@@ -36,8 +36,7 @@ class Controller(Strategy):
             self.model.restart()
 
     def update(self):
-        score = " : ".join(str(player.score) for player in self.model.players)
-        # self.view.score.configure(text=score)
+        score = self._get_score()
         self.view.score.update_(score)
 
         for i in range(self.model.board.n_rows):
@@ -49,3 +48,6 @@ class Controller(Strategy):
                     self.view.board.itemconfig(button_id, fill=color)
                 else:
                     self.view.board.itemconfig(button_id, fill="white")
+
+    def _get_score(self):
+        return " : ".join(str(player.score) for player in self.model.players)
