@@ -20,8 +20,8 @@ class Application(tk.Tk):
         controller = Controller(model, view)
 
         view.controller = controller
-        
+
         model.attach_observer(view)
         model.notify_observers()
 
-        view.grid(column=0, row=0, sticky="nesw")
+        view.grid(column=0, row=0, sticky="nsew")
