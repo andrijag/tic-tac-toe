@@ -22,7 +22,6 @@ class View(ttk.Frame, Observer):
         self.rowconfigure(1, weight=1)
         self.rowconfigure(2, weight=1)
 
-        # self.score = ttk.Label(self, text="score")
         self.score = ScoreBoard(self)
         self.score.grid(column=0, row=0, padx=10, pady=10)
 
@@ -67,6 +66,23 @@ class ScoreBoard(ttk.Label):
         self.configure(text=score)
 
 
+class BoardView(tk.Canvas):
+    pass
+
+
+class BoardTile:
+    def __init__(self, canvas, x0, y0, x1, y1):
+        self.canvas = canvas
+        self.x0 = x0
+        self.y0 = y0
+        self.x1 = x1
+        self.y1 = y1
+        self.id_ = canvas.create_rectangle(x0, y0, x1, y1, width=2, fill="white")
+
+    def draw_shape(self, shape):
+        shape.draw(self.canvas, self.x0, self.y0, self.x1, self.y1)
+
+
 class Shape(ABC):
     @property
     @abstractmethod
@@ -88,8 +104,13 @@ class Cross(Shape):
     def color(self):
         return self._color
 
-    def draw(self, canvas, *args, **kwargs):
-        canvas.create_line(*args, **kwargs, width=5, outline=self.color)
+    def draw(self, canvas, x0, y0, x1, y1, ipad=5):
+        x0 += ipad
+        y0 += ipad
+        x1 -= ipad
+        y1 -= ipad
+        canvas.create_line(x0, y0, x1, y1, width=5, outline=self.color)
+        canvas.create_line(x0, y1, x1, y0, width=5, outline=self.color)
 
 
 class Circle(Shape):
@@ -102,5 +123,9 @@ class Circle(Shape):
     def color(self):
         return self._color
 
-    def draw(self, canvas, x0, y0, x1, y1, *args, **kwargs):
-        canvas.create_line(*args, **kwargs, width=5, outline=self.color)
+    def draw(self, canvas, x0, y0, x1, y1, ipad=5):
+        x0 += ipad
+        y0 += ipad
+        x1 -= ipad
+        y1 -= ipad
+        canvas.create_oval(x0, y0, x1, y1, width=5, outline=self.color)
