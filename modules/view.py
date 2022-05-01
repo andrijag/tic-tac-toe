@@ -15,7 +15,7 @@ class View(ttk.Frame, Observer):
         self.controller = None
 
         self.shapes = [Cross(), Circle()]
-        self.colors = ["red", "blue"]
+        self.colors = ["blue", "red"]
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -23,16 +23,18 @@ class View(ttk.Frame, Observer):
         self.rowconfigure(2, weight=1)
 
         self.score = ScoreBoard(self)
-        self.score.grid(column=0, row=0, padx=10, pady=10)
 
         self.board = BoardView(self, n_rows, n_columns, square_width=70)
         for i in range(n_rows):
             for j in range(n_columns):
-                id_ = self.board[i][j]
-                self.board.tag_bind(id_, "<Button-1>", lambda event, x=i, y=j: self._click(x, y))
-        self.board.grid(column=0, row=1, padx=10, pady=10)
+                id_ = self.board[i][j].id_
+                command = lambda event, x=i, y=j: self._click(x, y)
+                self.board.tag_bind(id_, "<Button-1>", command)
 
         self.restart_button = ttk.Button(self, text="Restart", command=self._restart)
+
+        self.score.grid(column=0, row=0, padx=10, pady=10)
+        self.board.grid(column=0, row=1, padx=10, pady=10)
         self.restart_button.grid(column=0, row=2, padx=10, pady=10)
 
     def _click(self, i, j):
@@ -69,8 +71,7 @@ class BoardView(tk.Canvas):
                 y0 = i * square_width
                 x1 = x0 + square_width
                 y1 = y0 + square_width
-                id_ = self.create_rectangle(x0, y0, x1, y1, width=2, fill="white")
-                self._board[i][j] = id_
+                self._board[i][j] = BoardTile(self, x0, y0, x1, y1)
         self.create_rectangle(0, 0, canvas_width, canvas_height, width=5)
 
     def __getitem__(self, index):
