@@ -25,21 +25,11 @@ class View(ttk.Frame, Observer):
         self.score = ScoreBoard(self)
         self.score.grid(column=0, row=0, padx=10, pady=10)
 
-        square_width = 70
-        canvas_width = square_width * n_columns
-        canvas_height = square_width * n_rows
-        self.board = tk.Canvas(self, width=canvas_width, height=canvas_height)
-        self.board_buttons = [[0 for _ in range(n_columns)] for _ in range(n_rows)]
+        self.board = BoardView(self, n_rows, n_columns, square_width=70)
         for i in range(n_rows):
             for j in range(n_columns):
-                x0 = j * square_width
-                y0 = i * square_width
-                x1 = x0 + square_width
-                y1 = y0 + square_width
-                id_ = self.board.create_rectangle(x0, y0, x1, y1, width=2, fill="white")
+                id_ = self.board[i][j]
                 self.board.tag_bind(id_, "<Button-1>", lambda event, x=i, y=j: self._click(x, y))
-                self.board_buttons[i][j] = id_
-        self.board.create_rectangle(0, 0, canvas_width, canvas_height, width=5)
         self.board.grid(column=0, row=1, padx=10, pady=10)
 
         self.restart_button = ttk.Button(self, text="Restart", command=self._restart)
@@ -67,7 +57,24 @@ class ScoreBoard(ttk.Label):
 
 
 class BoardView(tk.Canvas):
-    pass
+    def __init__(self, parent, n_rows, n_columns, square_width=50):
+        canvas_width = square_width * n_columns
+        canvas_height = square_width * n_rows
+        super().__init__(parent, width=canvas_width, height=canvas_height)
+
+        self._board = [[0 for _ in range(n_columns)] for _ in range(n_rows)]
+        for i in range(n_rows):
+            for j in range(n_columns):
+                x0 = j * square_width
+                y0 = i * square_width
+                x1 = x0 + square_width
+                y1 = y0 + square_width
+                id_ = self.create_rectangle(x0, y0, x1, y1, width=2, fill="white")
+                self._board[i][j] = id_
+        self.create_rectangle(0, 0, canvas_width, canvas_height, width=5)
+
+    def __getitem__(self, index):
+        return self._board[index]
 
 
 class BoardTile:
