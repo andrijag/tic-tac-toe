@@ -41,10 +41,10 @@ class Controller(Strategy):
 
         for i in range(self.model.board.n_rows):
             for j in range(self.model.board.n_columns):
-                button_id = self.view.board_buttons[i][j]
+                button_id = self.view.board[i][j]
                 if self.model.board[i][j]:
-                    id_ = self.model.board[i][j]
-                    color = self.color_player[id_]
+                    value = self.model.board[i][j]
+                    color = self.color_player[value]
                     self.view.board.itemconfig(button_id, fill=color)
                 else:
                     self.view.board.itemconfig(button_id, fill="white")
