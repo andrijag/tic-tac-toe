@@ -34,20 +34,7 @@ class Controller(Strategy):
 
     def update(self):
         self._update_score()
-
-        for i in range(self.model.board.n_rows):
-            for j in range(self.model.board.n_columns):
-                value = self.model.board[i][j]
-                if value:
-                    self.view.board[i][j].draw_shape(self.player_shape[value])
-                else:
-                    self.view.board[i][j].erase()
-
-        if self.model._game_over:
-            for i in range(self.model.board.n_rows):
-                for j in range(self.model.board.n_columns):
-                    if self.model.board[i][j] and self.model._winning_move(i, j):
-                        self.view.board[i][j].fill()
+        self._update_board()
 
     def _update_score(self):
         score = self._get_score()
@@ -55,3 +42,13 @@ class Controller(Strategy):
 
     def _get_score(self):
         return " : ".join(str(player.score) for player in self.model.players)
+
+    def _update_board(self):
+        for i in range(self.model.board.n_rows):
+            for j in range(self.model.board.n_columns):
+                value = self.model.board[i][j]
+                if value:
+                    shape = self.player_shape[value]
+                    self.view.board[i][j].draw_shape(shape)
+                else:
+                    self.view.board[i][j].erase()
