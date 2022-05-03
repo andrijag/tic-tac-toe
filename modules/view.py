@@ -14,7 +14,7 @@ class View(ttk.Frame, Observer):
         super().__init__(parent)
         self.controller = None
 
-        self.shapes = [Cross(), Circle()]
+        self.shapes = [Cross("blue"), Circle("red")]
         self.colors = ["blue", "red"]
 
         self.columnconfigure(0, weight=1)
@@ -27,9 +27,9 @@ class View(ttk.Frame, Observer):
         self.board = BoardView(self, n_rows, n_columns, square_width=70)
         for i in range(n_rows):
             for j in range(n_columns):
-                id_ = self.board[i][j].id_
+                canvas_item_id = self.board[i][j].id_
                 command = lambda event, x=i, y=j: self._click(x, y)
-                self.board.tag_bind(id_, "<Button-1>", command)
+                self.board.tag_bind(canvas_item_id, "<Button-1>", command)
 
         self.restart_button = ttk.Button(self, text="Restart", command=self._restart)
 
@@ -51,20 +51,20 @@ class View(ttk.Frame, Observer):
 
 
 class ScoreBoard(ttk.Label):
-    def __init__(self, parent):
-        super().__init__(parent, text="score")
+    def __init__(self, master):
+        super().__init__(master, text="score")
 
     def update_(self, score):
         self.configure(text=score)
 
 
 class BoardView(tk.Canvas):
-    def __init__(self, parent, n_rows, n_columns, square_width=50):
+    def __init__(self, master, n_rows, n_columns, square_width=50):
         canvas_width = square_width * n_columns
         canvas_height = square_width * n_rows
-        super().__init__(parent, width=canvas_width, height=canvas_height)
+        super().__init__(master, width=canvas_width, height=canvas_height)
 
-        self._board = [[0 for _ in range(n_columns)] for _ in range(n_rows)]
+        self._board = [[None for _ in range(n_columns)] for _ in range(n_rows)]
         for i in range(n_rows):
             for j in range(n_columns):
                 x0 = j * square_width
@@ -86,9 +86,15 @@ class BoardTile:
         self.x1 = x1
         self.y1 = y1
         self.id_ = canvas.create_rectangle(x0, y0, x1, y1, width=2, fill="white")
+        self.shapes = []
 
     def draw_shape(self, shape):
-        shape.draw(self.canvas, self.x0, self.y0, self.x1, self.y1)
+        id_ = shape.draw(self.canvas, self.x0, self.y0, self.x1, self.y1)
+        self.shapes.extend(id_)
+
+    def erase(self):
+        for shape in self.shapes:
+            self.canvas.delete(shape)
 
 
 class Shape(ABC):
@@ -102,38 +108,26 @@ class Shape(ABC):
         pass
 
 
-class Cross(Shape):
-    def __init__(self):
-        self._color = "blue"
+class Cross:
+    def __init__(self, color):
+        self._color = color
 
-    def __str__(self):
-        return "X"
-
-    def color(self):
-        return self._color
-
-    def draw(self, canvas, x0, y0, x1, y1, ipad=5):
+    def draw(self, canvas, x0, y0, x1, y1, ipad=10):
         x0 += ipad
         y0 += ipad
         x1 -= ipad
         y1 -= ipad
-        canvas.create_line(x0, y0, x1, y1, width=5, outline=self.color)
-        canvas.create_line(x0, y1, x1, y0, width=5, outline=self.color)
+        return [canvas.create_line(x0, y0, x1, y1, width=10, fill=self._color),
+                canvas.create_line(x0, y1, x1, y0, width=10, fill=self._color)]
 
 
-class Circle(Shape):
-    def __init__(self):
-        self._color = "red"
+class Circle:
+    def __init__(self, color):
+        self._color = color
 
-    def __str__(self):
-        return "O"
-
-    def color(self):
-        return self._color
-
-    def draw(self, canvas, x0, y0, x1, y1, ipad=5):
+    def draw(self, canvas, x0, y0, x1, y1, ipad=10):
         x0 += ipad
         y0 += ipad
         x1 -= ipad
         y1 -= ipad
-        canvas.create_oval(x0, y0, x1, y1, width=5, outline=self.color)
+        return [canvas.create_oval(x0, y0, x1, y1, width=10, outline=self._color)]
