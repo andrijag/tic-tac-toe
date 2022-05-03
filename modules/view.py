@@ -23,7 +23,7 @@ class View(ttk.Frame, Observer):
 
         self.score = ScoreBoard(self)
 
-        self.board = BoardView(self, n_rows, n_columns, square_width=70)
+        self.board = BoardView(self, n_rows, n_columns, square_width=50)
         for i in range(n_rows):
             for j in range(n_columns):
                 canvas_item_id = self.board[i][j].id_
@@ -94,15 +94,15 @@ class BoardTile:
     def erase(self):
         for shape in self.shapes:
             self.canvas.delete(shape)
-        self.canvas.itemconfigure(self.id_, fill="white")
+        self.canvas.itemconfigure(self.id_, fill="white", stipple='')
 
-    def fill(self):
-        self.canvas.itemconfigure(self.id_, fill="lightyellow")
+    def fill(self, color):
+        self.canvas.itemconfigure(self.id_, fill=color, stipple="gray25")
 
 
 class Shape(ABC):
     def __init__(self, color):
-        self._color = color
+        self.color = color
 
     @abstractmethod
     def draw(self, canvas, x0, y0, x1, y1):
@@ -111,24 +111,10 @@ class Shape(ABC):
 
 class Cross(Shape):
     def draw(self, canvas, x0, y0, x1, y1):
-        return [canvas.create_line(x0, y0, x1, y1, width=10, fill=self._color),
-                canvas.create_line(x0, y1, x1, y0, width=10, fill=self._color)]
+        return [canvas.create_line(x0, y0, x1, y1, width=10, fill=self.color),
+                canvas.create_line(x0, y1, x1, y0, width=10, fill=self.color)]
 
 
 class Circle(Shape):
     def draw(self, canvas, x0, y0, x1, y1):
-        return [canvas.create_oval(x0, y0, x1, y1, width=10, outline=self._color)]
-
-
-class Triangle(Shape):
-    def draw(self, canvas, x0, y0, x1, y1):
-        x2 = (x0 + x1) / 2
-        y2 = y0 + 5
-        y0 = y1
-        return [
-            canvas.create_polygon(x0, y0, x1, y1, x2, y2, outline=self._color, fill='', width=9, joinstyle='miter')]
-
-
-class Rectangle(Shape):
-    def draw(self, canvas, x0, y0, x1, y1):
-        return [canvas.create_rectangle(x0, y0, x1, y1, outline=self._color, width=10)]
+        return [canvas.create_oval(x0, y0, x1, y1, width=9, outline=self.color)]
