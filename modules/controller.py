@@ -23,9 +23,6 @@ class Controller(Strategy):
         self.player_shape = {
             player.id_: view.shapes[i] for i, player in enumerate(model.players)
         }
-        self.color_player = {
-            player.id_: self.view.colors[i] for i, player in enumerate(self.model.players)
-        }
 
     def click(self, i, j):
         if self.model:
@@ -45,6 +42,12 @@ class Controller(Strategy):
                     self.view.board[i][j].draw_shape(self.player_shape[value])
                 else:
                     self.view.board[i][j].erase()
+
+        if self.model._game_over:
+            for i in range(self.model.board.n_rows):
+                for j in range(self.model.board.n_columns):
+                    if self.model.board[i][j] and self.model._winning_move(i, j):
+                        self.view.board[i][j].fill()
 
     def _update_score(self):
         score = self._get_score()

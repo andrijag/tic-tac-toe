@@ -15,7 +15,6 @@ class View(ttk.Frame, Observer):
         self.controller = None
 
         self.shapes = [Cross("blue"), Circle("red")]
-        self.colors = ["blue", "red"]
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -79,55 +78,57 @@ class BoardView(tk.Canvas):
 
 
 class BoardTile:
-    def __init__(self, canvas, x0, y0, x1, y1):
+    def __init__(self, canvas, x0, y0, x1, y1, ipad=10):
         self.canvas = canvas
-        self.x0 = x0
-        self.y0 = y0
-        self.x1 = x1
-        self.y1 = y1
+        self.x0 = x0 + ipad
+        self.y0 = y0 + ipad
+        self.x1 = x1 - ipad
+        self.y1 = y1 - ipad
         self.id_ = canvas.create_rectangle(x0, y0, x1, y1, width=2, fill="white")
         self.shapes = []
 
     def draw_shape(self, shape):
-        id_ = shape.draw(self.canvas, self.x0, self.y0, self.x1, self.y1)
-        self.shapes.extend(id_)
+        ids = shape.draw(self.canvas, self.x0, self.y0, self.x1, self.y1)
+        self.shapes.extend(ids)
 
     def erase(self):
         for shape in self.shapes:
             self.canvas.delete(shape)
+        self.canvas.itemconfigure(self.id_, fill="white")
+
+    def fill(self):
+        self.canvas.itemconfigure(self.id_, fill="lightyellow")
 
 
 class Shape(ABC):
-    @property
-    @abstractmethod
-    def color(self):
-        pass
-
-    @abstractmethod
-    def draw(self, *args, **kwargs):
-        pass
-
-
-class Cross:
     def __init__(self, color):
         self._color = color
 
-    def draw(self, canvas, x0, y0, x1, y1, ipad=10):
-        x0 += ipad
-        y0 += ipad
-        x1 -= ipad
-        y1 -= ipad
+    @abstractmethod
+    def draw(self, canvas, x0, y0, x1, y1):
+        pass
+
+
+class Cross(Shape):
+    def draw(self, canvas, x0, y0, x1, y1):
         return [canvas.create_line(x0, y0, x1, y1, width=10, fill=self._color),
                 canvas.create_line(x0, y1, x1, y0, width=10, fill=self._color)]
 
 
-class Circle:
-    def __init__(self, color):
-        self._color = color
-
-    def draw(self, canvas, x0, y0, x1, y1, ipad=10):
-        x0 += ipad
-        y0 += ipad
-        x1 -= ipad
-        y1 -= ipad
+class Circle(Shape):
+    def draw(self, canvas, x0, y0, x1, y1):
         return [canvas.create_oval(x0, y0, x1, y1, width=10, outline=self._color)]
+
+
+class Triangle(Shape):
+    def draw(self, canvas, x0, y0, x1, y1):
+        x2 = (x0 + x1) / 2
+        y2 = y0 + 5
+        y0 = y1
+        return [
+            canvas.create_polygon(x0, y0, x1, y1, x2, y2, outline=self._color, fill='', width=9, joinstyle='miter')]
+
+
+class Rectangle(Shape):
+    def draw(self, canvas, x0, y0, x1, y1):
+        return [canvas.create_rectangle(x0, y0, x1, y1, outline=self._color, width=10)]
