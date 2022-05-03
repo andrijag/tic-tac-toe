@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from abc import ABC, abstractmethod
+from .shapes import Cross, Circle
 
 
 class Observer(ABC):
@@ -23,7 +24,7 @@ class View(ttk.Frame, Observer):
 
         self.score = ScoreBoard(self)
 
-        self.board = BoardView(self, n_rows, n_columns, square_width=50)
+        self.board = BoardView(self, n_rows, n_columns, square_width=70)
         for i in range(n_rows):
             for j in range(n_columns):
                 canvas_item_id = self.board[i][j].id_
@@ -98,23 +99,3 @@ class BoardTile:
 
     def fill(self, color):
         self.canvas.itemconfigure(self.id_, fill=color, stipple="gray25")
-
-
-class Shape(ABC):
-    def __init__(self, color):
-        self.color = color
-
-    @abstractmethod
-    def draw(self, canvas, x0, y0, x1, y1):
-        pass
-
-
-class Cross(Shape):
-    def draw(self, canvas, x0, y0, x1, y1):
-        return [canvas.create_line(x0, y0, x1, y1, width=10, fill=self.color),
-                canvas.create_line(x0, y1, x1, y0, width=10, fill=self.color)]
-
-
-class Circle(Shape):
-    def draw(self, canvas, x0, y0, x1, y1):
-        return [canvas.create_oval(x0, y0, x1, y1, width=9, outline=self.color)]
