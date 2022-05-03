@@ -93,9 +93,10 @@ class BoardTile:
         self.shapes.extend(ids)
 
     def erase(self):
-        for shape in self.shapes:
-            self.canvas.delete(shape)
-        self.canvas.itemconfigure(self.id_, fill="white", stipple='')
+        for ids in self.shapes:
+            self.canvas.delete(ids)
+        self.shapes.clear()
+        self.canvas.itemconfigure(self.id_, fill="white", stipple="")
 
     def fill(self, color):
         self.canvas.itemconfigure(self.id_, fill=color, stipple="gray25")

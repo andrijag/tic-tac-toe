@@ -36,6 +36,13 @@ class Controller(Strategy):
         self._update_score()
         self._update_board()
 
+        if self.model._game_over:
+            for i in range(self.model.board.n_rows):
+                for j in range(self.model.board.n_columns):
+                    value = self.model.board[i][j]
+                    if value and self.model._winning_move(i, j):
+                        self.view.board[i][j].fill(self.player_shape[value].color)
+
     def _update_score(self):
         score = self._get_score()
         self.view.score.update_(score)
@@ -46,9 +53,8 @@ class Controller(Strategy):
     def _update_board(self):
         for i in range(self.model.board.n_rows):
             for j in range(self.model.board.n_columns):
+                self.view.board[i][j].erase()
                 value = self.model.board[i][j]
                 if value:
                     shape = self.player_shape[value]
                     self.view.board[i][j].draw_shape(shape)
-                else:
-                    self.view.board[i][j].erase()
