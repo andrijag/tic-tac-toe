@@ -36,18 +36,19 @@ class Controller(Strategy):
             self.model.restart()
 
     def update(self):
-        score = self._get_score()
-        self.view.score.update_(score)
+        self._update_score()
 
         for i in range(self.model.board.n_rows):
             for j in range(self.model.board.n_columns):
-                button_id = self.view.board[i][j].id_
-                if self.model.board[i][j]:
-                    value = self.model.board[i][j]
-                    color = self.color_player[value]
-                    self.view.board.itemconfig(button_id, fill=color)
+                value = self.model.board[i][j]
+                if value:
+                    self.view.board[i][j].draw_shape(self.player_shape[value])
                 else:
-                    self.view.board.itemconfig(button_id, fill="white")
+                    self.view.board[i][j].erase()
+
+    def _update_score(self):
+        score = self._get_score()
+        self.view.score.update_(score)
 
     def _get_score(self):
         return " : ".join(str(player.score) for player in self.model.players)
