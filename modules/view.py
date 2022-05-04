@@ -15,7 +15,7 @@ class View(ttk.Frame, Observer):
         super().__init__(parent)
         self.controller = None
 
-        self.shapes = [Cross("blue"), Circle("red")]
+        self.shapes = [Cross("blue", "light blue"), Circle("red", "pink")]
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -27,9 +27,9 @@ class View(ttk.Frame, Observer):
         self.board = BoardView(self, n_rows, n_columns, square_width=70)
         for i in range(n_rows):
             for j in range(n_columns):
-                canvas_item_id = self.board[i][j].id_
+                square_id = self.board[i][j].id_
                 command = lambda event, x=i, y=j: self._click(x, y)
-                self.board.tag_bind(canvas_item_id, "<Button-1>", command)
+                self.board.tag_bind(square_id, "<Button-1>", command)
 
         self.restart_button = ttk.Button(self, text="Restart", command=self._restart)
 
@@ -71,14 +71,14 @@ class BoardView(tk.Canvas):
                 y0 = i * square_width
                 x1 = x0 + square_width
                 y1 = y0 + square_width
-                self._board[i][j] = BoardTile(self, x0, y0, x1, y1)
+                self._board[i][j] = BoardSquare(self, x0, y0, x1, y1)
         self.create_rectangle(0, 0, canvas_width, canvas_height, width=5)
 
     def __getitem__(self, index):
         return self._board[index]
 
 
-class BoardTile:
+class BoardSquare:
     def __init__(self, canvas, x0, y0, x1, y1, ipad=10):
         self.canvas = canvas
         self.x0 = x0 + ipad
@@ -96,7 +96,10 @@ class BoardTile:
         for id_ in self.shape:
             self.canvas.delete(id_)
         self.shape.clear()
-        self.canvas.itemconfigure(self.id_, fill="white", stipple="")
+        self._fill("white")
 
-    def fill(self, color):
-        self.canvas.itemconfigure(self.id_, fill=color, stipple="gray25")
+    def _fill(self, color):
+        self.canvas.itemconfigure(self.id_, fill=color)
+
+    def highlight(self, shape):
+        self._fill(shape.highlight)
