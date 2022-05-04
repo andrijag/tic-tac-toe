@@ -86,16 +86,17 @@ class BoardTile:
         self.x1 = x1 - ipad
         self.y1 = y1 - ipad
         self.id_ = canvas.create_rectangle(x0, y0, x1, y1, width=2, fill="white")
-        self.shapes = []
+        self.shape = []
+        self.value = None
 
     def draw_shape(self, shape):
         ids = shape.draw(self.canvas, self.x0, self.y0, self.x1, self.y1)
-        self.shapes.extend(ids)
+        self.shape.extend(ids)
 
     def erase(self):
-        for ids in self.shapes:
-            self.canvas.delete(ids)
-        self.shapes.clear()
+        for id_ in self.shape:
+            self.canvas.delete(id_)
+        self.shape.clear()
         self.canvas.itemconfigure(self.id_, fill="white", stipple="")
 
     def fill(self, color):

@@ -53,8 +53,10 @@ class Controller(Strategy):
     def _update_board(self):
         for i in range(self.model.board.n_rows):
             for j in range(self.model.board.n_columns):
-                self.view.board[i][j].erase()
                 value = self.model.board[i][j]
-                if value:
-                    shape = self.player_shape[value]
-                    self.view.board[i][j].draw_shape(shape)
+                if value != self.view.board[i][j].value:
+                    if value:
+                        shape = self.player_shape[value]
+                        self.view.board[i][j].draw_shape(shape)
+                    else:
+                        self.view.board[i][j].erase()
