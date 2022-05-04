@@ -2,8 +2,9 @@ from abc import ABC, abstractmethod
 
 
 class Shape(ABC):
-    def __init__(self, color):
+    def __init__(self, color, highlight_color):
         self.color = color
+        self.highlight_color = highlight_color
 
     @abstractmethod
     def draw(self, canvas, x0, y0, x1, y1):
