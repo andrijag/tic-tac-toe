@@ -12,8 +12,8 @@ class Shape(ABC):
 
 
 class Cross(Shape):
-    def __init__(self, color, highlight):
-        super().__init__(color, highlight)
+    def __init__(self, *args):
+        super().__init__(*args)
         self.kwargs = {"width": 10, "fill": self.color}
 
     def draw(self, canvas, x0, y0, x1, y1):
@@ -24,8 +24,8 @@ class Cross(Shape):
 
 
 class Circle(Shape):
-    def __init__(self, color, highlight):
-        super().__init__(color, highlight)
+    def __init__(self, *args):
+        super().__init__(*args)
         self.kwargs = {"width": 9, "outline": self.color}
 
     def draw(self, canvas, x0, y0, x1, y1):
