@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class Strategy(ABC):
+class ControllerStrategy(ABC):
     @abstractmethod
     def click(self, i, j):
         pass
@@ -15,7 +15,7 @@ class Strategy(ABC):
         pass
 
 
-class Controller(Strategy):
+class Controller(ControllerStrategy):
     def __init__(self, model, view):
         self.model = model
         self.view = view
