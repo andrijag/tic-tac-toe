@@ -24,12 +24,12 @@ class View(ttk.Frame, Observer):
 
         self.score = ScoreBoard(self)
 
-        self.board = BoardView(self, n_rows, n_columns, square_width=70)
+        self.board = BoardView(self, n_rows, n_columns)
         for i in range(n_rows):
             for j in range(n_columns):
-                square_id = self.board[i][j].id_
+                board_square = self.board[i][j]
                 command = lambda event, x=i, y=j: self._click(x, y)
-                self.board.tag_bind(square_id, "<Button-1>", command)
+                self.board.tag_bind(board_square.id_, "<Button-1>", command)
 
         self.restart_button = ttk.Button(self, text="Restart", command=self._restart)
 
@@ -59,7 +59,7 @@ class ScoreBoard(ttk.Label):
 
 
 class BoardView(tk.Canvas):
-    def __init__(self, master, n_rows, n_columns, square_width=50):
+    def __init__(self, master, n_rows, n_columns, square_width=70):
         canvas_width = square_width * n_columns
         canvas_height = square_width * n_rows
         super().__init__(master, width=canvas_width, height=canvas_height)
@@ -89,14 +89,18 @@ class BoardSquare:
         self.shape = []
 
     def draw_shape(self, shape):
+        self._erase_shape()
         ids = shape.draw(self.canvas, self.x0, self.y0, self.x1, self.y1)
         self.shape.extend(ids)
 
     def erase(self):
+        self._erase_shape()
+        self._fill("white")
+
+    def _erase_shape(self):
         for id_ in self.shape:
             self.canvas.delete(id_)
         self.shape.clear()
-        self._fill("white")
 
     def _fill(self, color):
         self.canvas.itemconfigure(self.id_, fill=color)
