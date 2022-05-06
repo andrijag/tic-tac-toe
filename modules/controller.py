@@ -35,6 +35,8 @@ class Controller(ControllerStrategy):
     def update(self):
         self._update_score()
         self._update_board()
+        if self.model.game_over:
+            self._highlight_win()
 
     def _update_score(self):
         score = self._get_score()
@@ -47,10 +49,18 @@ class Controller(ControllerStrategy):
         for i in range(self.model.board.n_rows):
             for j in range(self.model.board.n_columns):
                 board_square = self.view.board[i][j]
-                board_square.erase()
                 value = self.model.board[i][j]
                 if value:
                     shape = self.player_shape[value]
                     board_square.draw_shape(shape)
-                    if self.model._game_over and self.model._winning_move(i, j):
-                        board_square.highlight(shape)
+                else:
+                    board_square.erase()
+
+    def _highlight_win(self):
+        for i in range(self.model.board.n_rows):
+            for j in range(self.model.board.n_columns):
+                value = self.model.board[i][j]
+                if value and self.model.winning_move(i, j):
+                    board_square = self.view.board[i][j]
+                    shape = self.player_shape[value]
+                    board_square.highlight(shape)
