@@ -7,7 +7,7 @@ N_ROWS = 3
 N_COLUMNS = 3
 CONNECT_N = 3
 
-SQUARE_WIDTH = 70
+SQUARE_WIDTH = 75
 
 
 class Application(tk.Tk):

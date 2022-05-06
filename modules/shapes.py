@@ -22,5 +22,5 @@ class Cross(Shape):
 
 class Circle(Shape):
     def draw(self, canvas, x0, y0, x1, y1, width=1):
-        kwargs = {"width": width - 1, "outline": self.color}
+        kwargs = {"width": width, "outline": self.color}
         return [canvas.create_oval(x0, y0, x1, y1, **kwargs)]
