@@ -7,8 +7,6 @@ N_ROWS = 3
 N_COLUMNS = 3
 CONNECT_N = 3
 
-SQUARE_WIDTH = 75
-
 
 class Application(tk.Tk):
     def __init__(self):
@@ -18,7 +16,7 @@ class Application(tk.Tk):
         self.rowconfigure(0, weight=1)
 
         model = Game(N_ROWS, N_COLUMNS, CONNECT_N)
-        view = View(self, N_ROWS, N_COLUMNS, SQUARE_WIDTH)
+        view = View(self, N_ROWS, N_COLUMNS)
         controller = Controller(model, view)
 
         view.controller = controller
