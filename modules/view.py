@@ -88,19 +88,23 @@ class BoardSquare:
     def bind(self, event, command):
         self.canvas.tag_bind(self.id_, event, command)
 
-    def draw_shape(self, shape):
-        self._erase_shape()
+    def update(self, shape=None):
+        self._erase()
+        if shape:
+            self._draw_shape(shape)
+
+    def _draw_shape(self, shape):
         ids = shape.draw(self.canvas, self.x0, self.y0, self.x1, self.y1)
         self.shape.extend(ids)
+
+    def _erase(self):
+        self._erase_shape()
+        self._fill("white")
 
     def _erase_shape(self):
         for id_ in self.shape:
             self.canvas.delete(id_)
         self.shape.clear()
-
-    def erase(self):
-        self._erase_shape()
-        self._fill("white")
 
     def _fill(self, color):
         self.canvas.itemconfigure(self.id_, fill=color)
