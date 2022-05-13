@@ -17,10 +17,12 @@ class View(ttk.Frame, Observer):
         self.shapes = [Cross("blue", "light blue"), Circle("red", "pink")]
 
         self.score = ScoreBoard(self)
-        self.board = BoardView(self, n_rows, n_columns, command=self._click)
+        self.board = BoardView(self, n_rows, n_columns)
         for i in range(n_rows):
             for j in range(n_columns):
-                self.board[i][j].bind("<Button-1>", lambda event, x=i, y=j: self._click(x, y))
+                self.board[i][j].bind(
+                    "<Button-1>", lambda event, x=i, y=j: self._click(x, y)
+                )
         self.restart_button = ttk.Button(self, text="Restart", command=self._restart)
 
         self.columnconfigure(0, weight=1)
@@ -53,7 +55,7 @@ class ScoreBoard(ttk.Label):
 
 
 class BoardView(tk.Canvas):
-    def __init__(self, master, n_rows, n_columns, command=None):
+    def __init__(self, master, n_rows, n_columns):
         square_width = 100
         canvas_width = square_width * n_columns
         canvas_height = square_width * n_rows
