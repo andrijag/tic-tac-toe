@@ -25,12 +25,10 @@ class Controller(ControllerStrategy):
         }
 
     def click(self, i, j):
-        if self.model:
-            self.model.tick(i, j)
+        self.model.tick(i, j)
 
     def restart(self):
-        if self.model:
-            self.model.restart()
+        self.model.restart()
 
     def update(self):
         self._update_score()
