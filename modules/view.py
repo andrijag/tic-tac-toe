@@ -13,6 +13,11 @@ class Observer(ABC):
 class View(ttk.Frame, Observer):
     def __init__(self, parent, n_rows, n_columns):
         super().__init__(parent)
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
+        self.rowconfigure(2, weight=1)
+
         self.controller = None
         self.shapes = [Cross("blue", "light blue"), Circle("red", "pink")]
 
@@ -25,10 +30,6 @@ class View(ttk.Frame, Observer):
                 )
         self.restart_button = ttk.Button(self, text="Restart", command=self._restart)
 
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
-        self.rowconfigure(1, weight=1)
-        self.rowconfigure(2, weight=1)
         self.score.grid(column=0, row=0, padx=10, pady=10)
         self.board.grid(column=0, row=1, padx=10, pady=10)
         self.restart_button.grid(column=0, row=2, padx=10, pady=10)
