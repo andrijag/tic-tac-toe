@@ -50,9 +50,9 @@ class Controller(ControllerStrategy):
                 value = self.model.board[i][j]
                 if value:
                     shape = self.player_shape[value]
-                    board_square.update(shape)
+                    board_square.update_shape(shape)
                 else:
-                    board_square.update()
+                    board_square.erase()
 
     def _highlight_win(self):
         for i in range(self.model.board.n_rows):
