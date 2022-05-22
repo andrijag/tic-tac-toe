@@ -46,7 +46,7 @@ class Controller(ControllerStrategy):
     def _update_board(self):
         for i in range(self.model.board.n_rows):
             for j in range(self.model.board.n_columns):
-                board_square = self.view.board[i][j]
+                board_square = self.view.board.get(i, j)
                 value = self.model.board[i][j]
                 if value:
                     shape = self.player_shape[value]
@@ -59,6 +59,6 @@ class Controller(ControllerStrategy):
             for j in range(self.model.board.n_columns):
                 value = self.model.board[i][j]
                 if value and self.model.winning_move(i, j):
-                    board_square = self.view.board[i][j]
+                    board_square = self.view.board.get(i, j)
                     shape = self.player_shape[value]
                     board_square.highlight(shape)
