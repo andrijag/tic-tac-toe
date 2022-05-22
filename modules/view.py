@@ -98,7 +98,7 @@ class BoardSquare:
     def bind(self, event, command):
         self.canvas.tag_bind(self.id_, event, command)
 
-    def update_shape(self, shape=None):
+    def update_shape(self, shape):
         self.erase()
         if shape:
             self._draw_shape(shape)
