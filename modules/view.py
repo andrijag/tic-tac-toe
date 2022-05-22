@@ -100,8 +100,7 @@ class BoardSquare:
 
     def update_shape(self, shape):
         self.erase()
-        if shape:
-            self._draw_shape(shape)
+        self._draw_shape(shape)
 
     def erase(self):
         self._erase_shape()
