@@ -20,7 +20,7 @@ class View(ttk.Frame, Observer):
         self.board = BoardView(self, n_rows, n_columns)
         for i in range(n_rows):
             for j in range(n_columns):
-                self.board[i][j].bind(
+                self.board.get(i, j).bind(
                     "<Button-1>", lambda event, x=i, y=j: self._click(x, y)
                 )
         self.restart_button = ttk.Button(self, text="Restart", command=self._restart)
@@ -61,18 +61,27 @@ class BoardView(tk.Canvas):
         canvas_height = square_width * n_rows
         super().__init__(master, width=canvas_width, height=canvas_height)
 
-        self._board = [[None for _ in range(n_columns)] for _ in range(n_rows)]
+        self._board = self._create_board(n_rows, n_columns, square_width)
+        self._create_frame(canvas_width, canvas_height)
+
+    def _create_board(self, n_rows, n_columns, square_width):
+        board = []
         for i in range(n_rows):
+            row = []
             for j in range(n_columns):
                 x0 = j * square_width
                 y0 = i * square_width
                 x1 = x0 + square_width
                 y1 = y0 + square_width
-                self._board[i][j] = BoardSquare(self, x0, y0, x1, y1)
-        self.create_rectangle(0, 0, canvas_width, canvas_height, width=5)
+                row.append(BoardSquare(self, x0, y0, x1, y1))
+            board.append(row)
+        return board
 
-    def __getitem__(self, index):
-        return self._board[index]
+    def _create_frame(self, width, height):
+        self.create_rectangle(0, 0, width, height, width=5)
+
+    def get(self, i, j):
+        return self._board[i][j]
 
 
 class BoardSquare:
@@ -93,10 +102,6 @@ class BoardSquare:
         if shape:
             self._draw_shape(shape)
 
-    def _draw_shape(self, shape):
-        ids = shape.draw(self.canvas, self.x0, self.y0, self.x1, self.y1)
-        self.shape.extend(ids)
-
     def _erase(self):
         self._erase_shape()
         self._fill("white")
@@ -108,6 +113,10 @@ class BoardSquare:
 
     def _fill(self, color):
         self.canvas.itemconfigure(self.id_, fill=color)
+
+    def _draw_shape(self, shape):
+        ids = shape.draw(self.canvas, self.x0, self.y0, self.x1, self.y1)
+        self.shape.extend(ids)
 
     def highlight(self, shape):
         self._fill(shape.highlight)
