@@ -122,9 +122,9 @@ class Validator:
 
     def _count_consecutive(self, i, j, di, dj):
         if (
-                i + di in range(self.board.n_rows)
-                and j + dj in range(self.board.n_columns)
-                and self.board[i][j] == self.board[i + di][j + dj]
+            i + di in range(self.board.n_rows)
+            and j + dj in range(self.board.n_columns)
+            and self.board[i][j] == self.board[i + di][j + dj]
         ):
             return 1 + self._count_consecutive(i + di, j + dj, di, dj)
         return 1
