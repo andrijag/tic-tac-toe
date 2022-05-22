@@ -20,7 +20,7 @@ class Game(Subject):
     def __init__(self, n_rows, n_columns, connect_n, n_players=2):
         self.players = [Player(i) for i in range(1, n_players + 1)]
         self._iterator = cycle(self.players)
-        self._player = next(self._iterator)
+        self.player = next(self._iterator)
         self.board = Board(n_rows, n_columns)
         self._validator = Validator(self.board, connect_n)
         self.game_over = False
@@ -38,7 +38,7 @@ class Game(Subject):
 
     def tick(self, i, j):
         if self._legal_move(i, j):
-            self._player.tick(self.board, i, j)
+            self.player.tick(self.board, i, j)
             if self.winning_move(i, j):
                 self._end_game()
             else:
@@ -53,14 +53,14 @@ class Game(Subject):
 
     def _end_game(self):
         self.game_over = True
-        self._player.score += 1
+        self.player.score += 1
 
     def _next_turn(self):
-        self._player = next(self._iterator)
+        self.player = next(self._iterator)
 
     def restart(self):
         self._iterator = cycle(self.players)
-        self._player = next(self._iterator)
+        self.player = next(self._iterator)
         self.board.reset()
         self.game_over = False
         self.notify_observers()
@@ -122,9 +122,9 @@ class Validator:
 
     def _count_consecutive(self, i, j, di, dj):
         if (
-            i + di in range(self.board.n_rows)
-            and j + dj in range(self.board.n_columns)
-            and self.board[i][j] == self.board[i + di][j + dj]
+                i + di in range(self.board.n_rows)
+                and j + dj in range(self.board.n_columns)
+                and self.board[i][j] == self.board[i + di][j + dj]
         ):
             return 1 + self._count_consecutive(i + di, j + dj, di, dj)
         return 1

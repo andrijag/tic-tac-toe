@@ -58,7 +58,8 @@ class Controller(ControllerStrategy):
         for i in range(self.model.board.n_rows):
             for j in range(self.model.board.n_columns):
                 value = self.model.board[i][j]
-                if value and self.model.winning_move(i, j):
+                winner = self.model.player
+                if value == winner.id_ and self.model.winning_move(i, j):
                     board_square = self.view.board.get(i, j)
                     shape = self.player_shape[value]
                     board_square.highlight(shape)
