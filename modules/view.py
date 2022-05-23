@@ -56,8 +56,7 @@ class ScoreBoard(ttk.Label):
 
 
 class BoardView(tk.Canvas):
-    def __init__(self, master, n_rows, n_columns):
-        square_width = 100
+    def __init__(self, master, n_rows, n_columns, square_width=100):
         canvas_width = square_width * n_columns
         canvas_height = square_width * n_rows
         super().__init__(master, width=canvas_width, height=canvas_height)
