@@ -33,8 +33,6 @@ class Controller(ControllerStrategy):
     def update(self):
         self._update_score()
         self._update_board()
-        if self.model.game_over:
-            self._highlight_win()
 
     def _update_score(self):
         score = self._get_score()
@@ -44,6 +42,11 @@ class Controller(ControllerStrategy):
         return " : ".join(str(player.score) for player in self.model.players)
 
     def _update_board(self):
+        self._update_shapes()
+        if self.model.game_over:
+            self._highlight_win()
+
+    def _update_shapes(self):
         for i in range(self.model.board.n_rows):
             for j in range(self.model.board.n_columns):
                 board_square = self.view.board.get(i, j)
