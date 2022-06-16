@@ -28,11 +28,11 @@ class View(ttk.Frame, Observer):
                 self.board.get(i, j).bind(
                     "<Button-1>", lambda event, x=i, y=j: self._click(x, y)
                 )
-        self.restart_button = ttk.Button(self, text="Restart", command=self._restart)
+        restart_button = ttk.Button(self, text="Restart", command=self._restart)
 
         self.score.grid(column=0, row=0, padx=10, pady=10)
         self.board.grid(column=0, row=1, padx=10, pady=10)
-        self.restart_button.grid(column=0, row=2, padx=10, pady=10)
+        restart_button.grid(column=0, row=2, padx=10, pady=10)
 
     def _click(self, i, j):
         if self.controller:
@@ -86,16 +86,16 @@ class BoardView(tk.Canvas):
 
 class BoardSquare:
     def __init__(self, canvas, x0, y0, x1, y1, ipad=10):
-        self.canvas = canvas
-        self.id_ = canvas.create_rectangle(x0, y0, x1, y1, width=2, fill="white")
-        self.x0 = x0 + ipad
-        self.y0 = y0 + ipad
-        self.x1 = x1 - ipad
-        self.y1 = y1 - ipad
-        self.shape = []
+        self._canvas = canvas
+        self._id = canvas.create_rectangle(x0, y0, x1, y1, width=2, fill="white")
+        self._x0 = x0 + ipad
+        self._y0 = y0 + ipad
+        self._x1 = x1 - ipad
+        self._y1 = y1 - ipad
+        self._shape = []
 
     def bind(self, event, command):
-        self.canvas.tag_bind(self.id_, event, command)
+        self._canvas.tag_bind(self._id, event, command)
 
     def update_shape(self, shape):
         self.erase()
@@ -106,16 +106,16 @@ class BoardSquare:
         self._fill("white")
 
     def _erase_shape(self):
-        for id_ in self.shape:
-            self.canvas.delete(id_)
-        self.shape.clear()
+        for id_ in self._shape:
+            self._canvas.delete(id_)
+        self._shape.clear()
 
     def _fill(self, color):
-        self.canvas.itemconfigure(self.id_, fill=color)
+        self._canvas.itemconfigure(self._id, fill=color)
 
     def _draw_shape(self, shape):
-        ids = shape.draw(self.canvas, self.x0, self.y0, self.x1, self.y1)
-        self.shape.extend(ids)
+        ids = shape.draw(self._canvas, self._x0, self._y0, self._x1, self._y1)
+        self._shape.extend(ids)
 
     def highlight(self, shape):
         self._fill(shape.highlight)

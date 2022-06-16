@@ -101,8 +101,8 @@ class Board:
 
 class Validator:
     def __init__(self, board, connect_n):
-        self.board = board
-        self.connect_n = connect_n
+        self._board = board
+        self._connect_n = connect_n
         self._vectors = {
             "horizontal": (0, 1),
             "vertical": (1, 0),
@@ -112,7 +112,7 @@ class Validator:
 
     def check(self, i, j):
         for di, dj in self._vectors.values():
-            if self._count_in_direction(i, j, di, dj) >= self.connect_n:
+            if self._count_in_direction(i, j, di, dj) >= self._connect_n:
                 return True
 
     def _count_in_direction(self, i, j, di, dj):
@@ -122,9 +122,9 @@ class Validator:
 
     def _count_consecutive(self, i, j, di, dj):
         if (
-            i + di in range(self.board.n_rows)
-            and j + dj in range(self.board.n_columns)
-            and self.board[i][j] == self.board[i + di][j + dj]
+            i + di in range(self._board.n_rows)
+            and j + dj in range(self._board.n_columns)
+            and self._board[i][j] == self._board[i + di][j + dj]
         ):
             return 1 + self._count_consecutive(i + di, j + dj, di, dj)
         return 1

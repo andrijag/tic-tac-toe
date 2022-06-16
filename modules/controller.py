@@ -17,18 +17,18 @@ class ControllerStrategy(ABC):
 
 class Controller(ControllerStrategy):
     def __init__(self, model, view):
-        self.model = model
-        self.view = view
+        self._model = model
+        self._view = view
 
-        self.player_shape = {
+        self._player_shape = {
             player.id_: view.shapes[i] for i, player in enumerate(model.players)
         }
 
     def click(self, i, j):
-        self.model.tick(i, j)
+        self._model.tick(i, j)
 
     def restart(self):
-        self.model.restart()
+        self._model.restart()
 
     def update(self):
         self._update_score()
@@ -36,33 +36,33 @@ class Controller(ControllerStrategy):
 
     def _update_score(self):
         score = self._get_score()
-        self.view.score.update_(score)
+        self._view.score.update_(score)
 
     def _get_score(self):
-        return " : ".join(str(player.score) for player in self.model.players)
+        return " : ".join(str(player.score) for player in self._model.players)
 
     def _update_board(self):
         self._update_shapes()
-        if self.model.game_over:
+        if self._model.game_over:
             self._highlight_win()
 
     def _update_shapes(self):
-        for i in range(self.model.board.n_rows):
-            for j in range(self.model.board.n_columns):
-                board_square = self.view.board.get(i, j)
-                value = self.model.board[i][j]
+        for i in range(self._model.board.n_rows):
+            for j in range(self._model.board.n_columns):
+                board_square = self._view.board.get(i, j)
+                value = self._model.board[i][j]
                 if value:
-                    shape = self.player_shape[value]
+                    shape = self._player_shape[value]
                     board_square.update_shape(shape)
                 else:
                     board_square.erase()
 
     def _highlight_win(self):
-        for i in range(self.model.board.n_rows):
-            for j in range(self.model.board.n_columns):
-                value = self.model.board[i][j]
-                winner = self.model.player
-                if value == winner.id_ and self.model.winning_move(i, j):
-                    board_square = self.view.board.get(i, j)
-                    shape = self.player_shape[value]
+        for i in range(self._model.board.n_rows):
+            for j in range(self._model.board.n_columns):
+                value = self._model.board[i][j]
+                winner = self._model.player
+                if value == winner.id_ and self._model.winning_move(i, j):
+                    board_square = self._view.board.get(i, j)
+                    shape = self._player_shape[value]
                     board_square.highlight(shape)
