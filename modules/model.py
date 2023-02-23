@@ -18,6 +18,9 @@ class Subject(ABC):
 
 class TicTacToe(Subject):
     def __init__(self, n_rows, n_columns, connect_n, n_players=2):
+        self.n_rows = n_rows
+        self.n_columns = n_columns
+        self.connect_n = connect_n
         self.players = [Player(i) for i in range(1, n_players + 1)]
         self._iterator = cycle(self.players)
         self.player = next(self._iterator)
@@ -62,7 +65,7 @@ class TicTacToe(Subject):
     def restart(self):
         self._iterator = cycle(self.players)
         self.player = next(self._iterator)
-        self.board.reset()
+        self.board = Board(self.n_rows, self.n_columns)
         self.game_over = False
         self.notify_observers()
 
@@ -93,9 +96,6 @@ class Board:
 
     def __str__(self):
         return str(self._matrix)
-
-    def reset(self):
-        self._matrix = [[0 for _ in range(self.n_columns)] for _ in range(self.n_rows)]
 
 
 class Validator:
