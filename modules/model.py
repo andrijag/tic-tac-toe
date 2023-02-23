@@ -25,7 +25,6 @@ class TicTacToe(Subject):
         self._iterator = cycle(self.players)
         self.player = next(self._iterator)
         self.board = Board(n_rows, n_columns)
-        self._validator = Validator(self.board, connect_n)
         self.game_over = False
         self._observers = []
 
@@ -53,7 +52,7 @@ class TicTacToe(Subject):
         return not self.game_over and not self.board[i][j]
 
     def winning_move(self, i, j):
-        return self._validator.check(i, j)
+        return Utils.check(self.board, i, j, self.connect_n)
 
     def _end_game(self):
         self.game_over = True
@@ -98,32 +97,32 @@ class Board:
         return str(self._matrix)
 
 
-class Validator:
-    def __init__(self, board, connect_n):
-        self._board = board
-        self._connect_n = connect_n
-        self._vectors = {
-            "horizontal": (0, 1),
-            "vertical": (1, 0),
-            "diagonal": (1, 1),
-            "anti-diagonal": (-1, 1),
-        }
+class Utils:
+    vectors = {
+        "horizontal": (0, 1),
+        "vertical": (1, 0),
+        "diagonal": (1, 1),
+        "anti-diagonal": (-1, 1),
+    }
 
-    def check(self, i, j):
-        for di, dj in self._vectors.values():
-            if self._count_in_direction(i, j, di, dj) >= self._connect_n:
+    @staticmethod
+    def check(board, i, j, connect_n):
+        for di, dj in Utils.vectors.values():
+            if Utils._count_in_direction(board, i, j, di, dj) >= connect_n:
                 return True
 
-    def _count_in_direction(self, i, j, di, dj):
-        direction = self._count_consecutive(i, j, di, dj)
-        opposite_direction = self._count_consecutive(i, j, -di, -dj)
+    @staticmethod
+    def _count_in_direction(board, i, j, di, dj):
+        direction = Utils._count_consecutive(board, i, j, di, dj)
+        opposite_direction = Utils._count_consecutive(board, i, j, -di, -dj)
         return direction + opposite_direction - 1
 
-    def _count_consecutive(self, i, j, di, dj):
+    @staticmethod
+    def _count_consecutive(board, i, j, di, dj):
         if (
-                i + di in range(self._board.n_rows)
-                and j + dj in range(self._board.n_columns)
-                and self._board[i][j] == self._board[i + di][j + dj]
+                i + di in range(board.n_rows)
+                and j + dj in range(board.n_columns)
+                and board[i][j] == board[i + di][j + dj]
         ):
-            return 1 + self._count_consecutive(i + di, j + dj, di, dj)
+            return 1 + Utils._count_consecutive(board, i + di, j + dj, di, dj)
         return 1
