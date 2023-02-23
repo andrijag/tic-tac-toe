@@ -1,31 +1,8 @@
-from abc import ABC, abstractmethod
 from itertools import cycle
 
 
-class Subject(ABC):
-    @abstractmethod
-    def attach_observer(self, observer):
-        pass
-
-    @abstractmethod
-    def detach_observer(self, observer):
-        pass
-
-    @abstractmethod
-    def notify_observers(self):
-        pass
-
-
-class TicTacToe(Subject):
-    def __init__(self, n_rows, n_columns, connect_n, n_players=2):
-        self.n_rows = n_rows
-        self.n_columns = n_columns
-        self.connect_n = connect_n
-        self.players = [Player(i) for i in range(1, n_players + 1)]
-        self._iterator = cycle(self.players)
-        self.player = next(self._iterator)
-        self.board = Board(n_rows, n_columns)
-        self.game_over = False
+class Subject:
+    def __init__(self):
         self._observers = []
 
     def attach_observer(self, observer):
@@ -37,6 +14,20 @@ class TicTacToe(Subject):
     def notify_observers(self):
         for observer in self._observers:
             observer.update_()
+
+
+class TicTacToe(Subject):
+    def __init__(self, n_rows, n_columns, connect_n, n_players=2):
+        super().__init__()
+        self.n_rows = n_rows
+        self.n_columns = n_columns
+        self.connect_n = connect_n
+        self.players = [Player(i) for i in range(1, n_players + 1)]
+        self._iterator = cycle(self.players)
+        self.player = next(self._iterator)
+        self.board = Board(n_rows, n_columns)
+        self.game_over = False
+        self._observers = []
 
     def tick(self, i, j):
         if not self._legal_move(i, j):
