@@ -95,9 +95,7 @@ class Board:
         return str(self._matrix)
 
     def reset(self):
-        for i in range(self.n_rows):
-            for j in range(self.n_columns):
-                self._matrix[i][j] = 0
+        self._matrix = [[0 for _ in range(self.n_columns)] for _ in range(self.n_rows)]
 
 
 class Validator:
