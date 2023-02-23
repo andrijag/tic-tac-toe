@@ -47,8 +47,8 @@ class Controller(ControllerStrategy):
             self._highlight_win()
 
     def _update_shapes(self):
-        for i in range(self._model.board.n_rows):
-            for j in range(self._model.board.n_columns):
+        for i in range(self._model.n_rows):
+            for j in range(self._model.n_columns):
                 board_square = self._view.board.get(i, j)
                 value = self._model.board[i][j]
                 if value:
@@ -58,8 +58,8 @@ class Controller(ControllerStrategy):
                     board_square.erase()
 
     def _highlight_win(self):
-        for i in range(self._model.board.n_rows):
-            for j in range(self._model.board.n_columns):
+        for i in range(self._model.n_rows):
+            for j in range(self._model.n_columns):
                 value = self._model.board[i][j]
                 winner = self._model.player
                 if value == winner.id_ and self._model.winning_move(i, j):
