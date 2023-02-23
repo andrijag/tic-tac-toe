@@ -83,9 +83,9 @@ class Player:
 
 class Board:
     def __init__(self, n_rows, n_columns):
-        self._matrix = [[0 for _ in range(n_columns)] for _ in range(n_rows)]
         self.n_rows = n_rows
         self.n_columns = n_columns
+        self._matrix = [[0 for _ in range(n_columns)] for _ in range(n_rows)]
 
     def __getitem__(self, key):
         return self._matrix[key]
@@ -120,9 +120,9 @@ class Utils:
     @staticmethod
     def _count_consecutive(board, i, j, di, dj):
         if (
-                i + di in range(board.n_rows)
-                and j + dj in range(board.n_columns)
-                and board[i][j] == board[i + di][j + dj]
+            i + di in range(board.n_rows)
+            and j + dj in range(board.n_columns)
+            and board[i][j] == board[i + di][j + dj]
         ):
             return 1 + Utils._count_consecutive(board, i + di, j + dj, di, dj)
         return 1
