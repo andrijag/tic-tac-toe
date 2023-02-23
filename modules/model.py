@@ -16,7 +16,7 @@ class Subject(ABC):
         pass
 
 
-class Game(Subject):
+class TicTacToe(Subject):
     def __init__(self, n_rows, n_columns, connect_n, n_players=2):
         self.players = [Player(i) for i in range(1, n_players + 1)]
         self._iterator = cycle(self.players)
@@ -37,13 +37,14 @@ class Game(Subject):
             observer.update_()
 
     def tick(self, i, j):
-        if self._legal_move(i, j):
-            self.player.tick(self.board, i, j)
-            if self.winning_move(i, j):
-                self._end_game()
-            else:
-                self._next_turn()
-            self.notify_observers()
+        if not self._legal_move(i, j):
+            return
+        self.player.tick(self.board, i, j)
+        if self.winning_move(i, j):
+            self._end_game()
+        else:
+            self._next_turn()
+        self.notify_observers()
 
     def _legal_move(self, i, j):
         return not self.game_over and not self.board[i][j]
@@ -80,23 +81,23 @@ class Player:
 
 class Board:
     def __init__(self, n_rows, n_columns):
-        self._board = [[0 for _ in range(n_columns)] for _ in range(n_rows)]
+        self._matrix = [[0 for _ in range(n_columns)] for _ in range(n_rows)]
         self.n_rows = n_rows
         self.n_columns = n_columns
 
     def __getitem__(self, key):
-        return self._board[key]
+        return self._matrix[key]
 
     def __setitem__(self, key, value):
-        self._board[key] = value
+        self._matrix[key] = value
 
     def __str__(self):
-        return str(self._board)
+        return str(self._matrix)
 
     def reset(self):
         for i in range(self.n_rows):
             for j in range(self.n_columns):
-                self._board[i][j] = 0
+                self._matrix[i][j] = 0
 
 
 class Validator:
@@ -122,9 +123,9 @@ class Validator:
 
     def _count_consecutive(self, i, j, di, dj):
         if (
-            i + di in range(self._board.n_rows)
-            and j + dj in range(self._board.n_columns)
-            and self._board[i][j] == self._board[i + di][j + dj]
+                i + di in range(self._board.n_rows)
+                and j + dj in range(self._board.n_columns)
+                and self._board[i][j] == self._board[i + di][j + dj]
         ):
             return 1 + self._count_consecutive(i + di, j + dj, di, dj)
         return 1
