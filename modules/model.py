@@ -27,7 +27,6 @@ class TicTacToe(Subject):
         self.player = next(self._iterator)
         self.board = Board(n_rows, n_columns)
         self.game_over = False
-        self._observers = []
 
     def tick(self, i, j):
         if not self._legal_move(i, j):
@@ -111,9 +110,9 @@ class Utils:
     @staticmethod
     def _count_consecutive(board, i, j, di, dj):
         if (
-            i + di in range(board.n_rows)
-            and j + dj in range(board.n_columns)
-            and board[i][j] == board[i + di][j + dj]
+                i + di in range(board.n_rows)
+                and j + dj in range(board.n_columns)
+                and board[i][j] == board[i + di][j + dj]
         ):
             return 1 + Utils._count_consecutive(board, i + di, j + dj, di, dj)
         return 1
