@@ -56,6 +56,7 @@ class TicTacToe(Subject):
         self._iterator = cycle(self.players)
         self.player = next(self._iterator)
         self.board = Board(self.n_rows, self.n_columns)
+        self._evaluator = Evaluator(self.board, self.connect_n)
         self.game_over = False
         self.notify_observers()
 
@@ -111,9 +112,9 @@ class Evaluator:
 
     def _count_consecutive(self, i, j, di, dj):
         if (
-            i + di in range(self._board.n_rows)
-            and j + dj in range(self._board.n_columns)
-            and self._board[i][j] == self._board[i + di][j + dj]
+                i + di in range(self._board.n_rows)
+                and j + dj in range(self._board.n_columns)
+                and self._board[i][j] == self._board[i + di][j + dj]
         ):
             return 1 + self._count_consecutive(i + di, j + dj, di, dj)
         return 1
