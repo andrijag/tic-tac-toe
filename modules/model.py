@@ -112,9 +112,9 @@ class Evaluator:
 
     def _count_consecutive(self, i, j, di, dj):
         if (
-                i + di in range(self._board.n_rows)
-                and j + dj in range(self._board.n_columns)
-                and self._board[i][j] == self._board[i + di][j + dj]
+            i + di in range(self._board.n_rows)
+            and j + dj in range(self._board.n_columns)
+            and self._board[i][j] == self._board[i + di][j + dj]
         ):
             return 1 + self._count_consecutive(i + di, j + dj, di, dj)
         return 1

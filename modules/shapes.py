@@ -13,12 +13,39 @@ class Shape(ABC):
 
 class Cross(Shape):
     def draw(self, canvas, x0, y0, x1, y1):
+        ipadx = (x1 - x0) / 10
+        ipady = (y1 - y0) / 10
         return [
-            canvas.create_line(x0, y0, x1, y1, width=10, fill=self._color),
-            canvas.create_line(x0, y1, x1, y0, width=10, fill=self._color),
+            canvas.create_line(
+                x0 + ipadx,
+                y0 + ipady,
+                x1 - ipadx,
+                y1 - ipady,
+                width=5,
+                fill=self._color,
+            ),
+            canvas.create_line(
+                x0 + ipadx,
+                y1 - ipady,
+                x1 - ipadx,
+                y0 + ipady,
+                width=5,
+                fill=self._color,
+            ),
         ]
 
 
 class Circle(Shape):
     def draw(self, canvas, x0, y0, x1, y1):
-        return [canvas.create_oval(x0, y0, x1, y1, width=11, outline=self._color)]
+        ipadx = (x1 - x0) / 10
+        ipady = (y1 - y0) / 10
+        return [
+            canvas.create_oval(
+                x0 + ipadx,
+                y0 + ipady,
+                x1 - ipadx,
+                y1 - ipady,
+                width=5,
+                outline=self._color,
+            )
+        ]

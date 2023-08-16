@@ -11,40 +11,75 @@ class Observer(ABC):
 
 
 class View(ttk.Frame, Observer):
-    def __init__(self, parent, n_rows, n_columns):
+    def __init__(self, parent, model):
         super().__init__(parent)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
         self.rowconfigure(2, weight=1)
 
-        self.controller = None
-        self.shapes = [Cross("blue", "light blue"), Circle("red", "pink")]
+        self._model = model
+        self._shapes = [Cross("blue", "light blue"), Circle("red", "pink")]
+
+        self._player_shape = {
+            player.id_: self._shapes[i] for i, player in enumerate(model.players)
+        }
 
         self.score = ScoreBoard(self)
-        self.board = BoardView(self, n_rows, n_columns)
-        for i in range(n_rows):
-            for j in range(n_columns):
+        self.board = BoardView(self, model.n_rows, model.n_columns)
+        for i in range(model.n_rows):
+            for j in range(model.n_columns):
                 self.board.get(i, j).bind(
                     "<Button-1>", lambda event, x=i, y=j: self._click(x, y)
                 )
         restart_button = ttk.Button(self, text="Restart", command=self._restart)
 
         self.score.grid(column=0, row=0, padx=10, pady=10)
-        self.board.grid(column=0, row=1, padx=10, pady=10)
+        self.board.grid(column=0, row=1, padx=10, pady=10, sticky="nsew")
         restart_button.grid(column=0, row=2, padx=10, pady=10)
 
     def _click(self, i, j):
-        if self.controller:
-            self.controller.click(i, j)
+        self._model.tick(i, j)
 
     def _restart(self):
-        if self.controller:
-            self.controller.restart()
+        self._model.restart()
 
     def update_(self):
-        if self.controller:
-            self.controller.update()
+        self._update_score()
+        self._update_board()
+
+    def _update_score(self):
+        score = self._get_score()
+        self.score.update_(score)
+
+    def _get_score(self):
+        return " : ".join(str(player.score) for player in self._model.players)
+
+    def _update_board(self):
+        self._update_shapes()
+        if self._model.game_over:
+            self._highlight_win()
+
+    def _update_shapes(self):
+        for i in range(self._model.n_rows):
+            for j in range(self._model.n_columns):
+                board_square = self.board.get(i, j)
+                value = self._model.board[i][j]
+                if value:
+                    shape = self._player_shape[value]
+                    board_square.update_shape(shape)
+                else:
+                    board_square.erase()
+
+    def _highlight_win(self):
+        for i in range(self._model.n_rows):
+            for j in range(self._model.n_columns):
+                value = self._model.board[i][j]
+                winner = self._model.player
+                if value == winner.id_ and self._model.winning_move(i, j):
+                    board_square = self.board.get(i, j)
+                    shape = self._player_shape[value]
+                    board_square.highlight(shape)
 
 
 class ScoreBoard(ttk.Label):
@@ -56,23 +91,34 @@ class ScoreBoard(ttk.Label):
 
 
 class BoardView(tk.Canvas):
-    def __init__(self, master, n_rows, n_columns, square_width=100):
-        canvas_width = square_width * n_columns
-        canvas_height = square_width * n_rows
-        super().__init__(master, width=canvas_width, height=canvas_height)
+    def __init__(self, master, n_rows, n_columns):
+        square_size = 100
+        canvas_width = square_size * n_columns
+        canvas_height = square_size * n_rows
+        super().__init__(
+            master, width=canvas_width, height=canvas_height, highlightthickness=0
+        )
 
-        self._board = self._create_board(n_rows, n_columns, square_width)
+        self.bind("<Configure>", self.resize)
+
+        self._board = self._create_board(n_rows, n_columns, square_size)
         self._create_frame(canvas_width, canvas_height)
 
-    def _create_board(self, n_rows, n_columns, square_width):
+    def resize(self, event):
+        width_ratio = event.width / self.winfo_reqwidth()
+        height_ratio = event.height / self.winfo_reqheight()
+        self.scale("all", 0, 0, width_ratio, height_ratio)
+        self.configure(width=event.width, height=event.height)
+
+    def _create_board(self, n_rows, n_columns, square_size):
         board = []
         for i in range(n_rows):
             row = []
             for j in range(n_columns):
-                x0 = j * square_width
-                y0 = i * square_width
-                x1 = x0 + square_width
-                y1 = y0 + square_width
+                x0 = j * square_size
+                y0 = i * square_size
+                x1 = x0 + square_size
+                y1 = y0 + square_size
                 row.append(BoardSquare(self, x0, y0, x1, y1))
             board.append(row)
         return board
@@ -85,13 +131,9 @@ class BoardView(tk.Canvas):
 
 
 class BoardSquare:
-    def __init__(self, canvas, x0, y0, x1, y1, ipad=10):
+    def __init__(self, canvas, x0, y0, x1, y1):
         self._canvas = canvas
         self._id = canvas.create_rectangle(x0, y0, x1, y1, width=2, fill="white")
-        self._x0 = x0 + ipad
-        self._y0 = y0 + ipad
-        self._x1 = x1 - ipad
-        self._y1 = y1 - ipad
         self._shape = []
 
     def bind(self, event, command):
@@ -114,7 +156,8 @@ class BoardSquare:
         self._canvas.itemconfigure(self._id, fill=color)
 
     def _draw_shape(self, shape):
-        ids = shape.draw(self._canvas, self._x0, self._y0, self._x1, self._y1)
+        coords = self._canvas.coords(self._id)
+        ids = shape.draw(self._canvas, *coords)
         self._shape.extend(ids)
 
     def highlight(self, shape):
