@@ -26,7 +26,13 @@ class View(ttk.Frame, Observer):
         }
 
         self.score = ScoreBoard(self)
-        self.board = BoardView(self, model.n_rows, model.n_columns)
+        square_size = 100
+        frame_width = square_size * model.n_columns
+        frame_height = square_size * model.n_rows
+        self.frame = FixedAspectRatioPadding(
+            self, frame_width, frame_height
+        )
+        self.board = BoardView(self.frame.inner_frame, model.n_rows, model.n_columns)
         for i in range(model.n_rows):
             for j in range(model.n_columns):
                 self.board.get(i, j).bind(
@@ -35,7 +41,8 @@ class View(ttk.Frame, Observer):
         restart_button = ttk.Button(self, text="Restart", command=self._restart)
 
         self.score.grid(column=0, row=0, padx=10, pady=10)
-        self.board.grid(column=0, row=1, padx=10, pady=10, sticky="nsew")
+        self.frame.grid(column=0, row=1, padx=10, pady=10, sticky="nsew")
+        self.board.pack(expand=True, fill="both")
         restart_button.grid(column=0, row=2, padx=10, pady=10)
 
     def _click(self, i, j):
@@ -90,6 +97,32 @@ class ScoreBoard(ttk.Label):
         self.configure(text=score)
 
 
+class FixedAspectRatioPadding(ttk.Frame):
+    def __init__(self, parent, width, height):
+        super().__init__(parent, width=width, height=height)
+
+        self.bind("<Configure>", self._resize)
+
+        self.aspect_ratio = width / height
+        self.inner_frame = ttk.Frame(self, width=width, height=height)
+
+        self.inner_frame.place(
+            width=width, height=height, anchor="center", x=width / 2, y=height / 2
+        )
+
+    def _resize(self, event):
+        widget_width = min(event.height * self.aspect_ratio, event.width)
+        widget_height = min(event.height, event.width / self.aspect_ratio)
+        self.inner_frame.place(
+            width=widget_width,
+            height=widget_height,
+            anchor="center",
+            x=event.width / 2,
+            y=event.height / 2,
+        )
+        self.configure(width=event.width, height=event.height)
+
+
 class BoardView(tk.Canvas):
     def __init__(self, master, n_rows, n_columns):
         square_size = 100
@@ -99,12 +132,12 @@ class BoardView(tk.Canvas):
             master, width=canvas_width, height=canvas_height, highlightthickness=0
         )
 
-        self.bind("<Configure>", self.resize)
+        self.bind("<Configure>", self._resize)
 
         self._board = self._create_board(n_rows, n_columns, square_size)
         self._create_frame(canvas_width, canvas_height)
 
-    def resize(self, event):
+    def _resize(self, event):
         width_ratio = event.width / self.winfo_reqwidth()
         height_ratio = event.height / self.winfo_reqheight()
         self.scale("all", 0, 0, width_ratio, height_ratio)
@@ -148,8 +181,7 @@ class BoardSquare:
         self._fill("white")
 
     def _erase_shape(self):
-        for id_ in self._shape:
-            self._canvas.delete(id_)
+        self._canvas.delete(*self._shape)
         self._shape.clear()
 
     def _fill(self, color):
