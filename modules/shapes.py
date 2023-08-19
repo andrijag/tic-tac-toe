@@ -21,7 +21,6 @@ class Cross(Shape):
                 y0 + ipady,
                 x1 - ipadx,
                 y1 - ipady,
-                width=10,
                 fill=self._color,
             ),
             canvas.create_line(
@@ -29,7 +28,6 @@ class Cross(Shape):
                 y1 - ipady,
                 x1 - ipadx,
                 y0 + ipady,
-                width=10,
                 fill=self._color,
             ),
         ]
@@ -45,7 +43,6 @@ class Circle(Shape):
                 y0 + ipady,
                 x1 - ipadx,
                 y1 - ipady,
-                width=9,
                 outline=self._color,
             )
         ]

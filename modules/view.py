@@ -29,9 +29,7 @@ class View(ttk.Frame, Observer):
         square_size = 100
         frame_width = square_size * model.n_columns
         frame_height = square_size * model.n_rows
-        self.frame = FixedAspectRatioPadding(
-            self, frame_width, frame_height
-        )
+        self.frame = FixedAspectRatioPadding(self, frame_width, frame_height)
         self.board = BoardView(self.frame.inner_frame, model.n_rows, model.n_columns)
         for i in range(model.n_rows):
             for j in range(model.n_columns):
@@ -135,13 +133,19 @@ class BoardView(tk.Canvas):
         self.bind("<Configure>", self._resize)
 
         self._board = self._create_board(n_rows, n_columns, square_size)
-        self._create_frame(canvas_width, canvas_height)
+        self._frame = self._create_frame(canvas_width, canvas_height)
 
     def _resize(self, event):
         width_ratio = event.width / self.winfo_reqwidth()
         height_ratio = event.height / self.winfo_reqheight()
-        self.scale("all", 0, 0, width_ratio, height_ratio)
+        self._scale_board(width_ratio, height_ratio)
         self.configure(width=event.width, height=event.height)
+
+    def _scale_board(self, width_ratio, height_ratio):
+        self.scale("all", 0, 0, width_ratio, height_ratio)
+        for row in self._board:
+            for board_square in row:
+                board_square.update_shape_width()
 
     def _create_board(self, n_rows, n_columns, square_size):
         board = []
@@ -157,7 +161,7 @@ class BoardView(tk.Canvas):
         return board
 
     def _create_frame(self, width, height):
-        self.create_rectangle(0, 0, width, height, width=5)
+        return self.create_rectangle(0, 0, width, height, width=5)
 
     def get(self, i, j):
         return self._board[i][j]
@@ -168,6 +172,12 @@ class BoardSquare:
         self._canvas = canvas
         self._id = canvas.create_rectangle(x0, y0, x1, y1, width=2, fill="white")
         self._shape = []
+
+    def update_shape_width(self):
+        x0, y0, x1, y1 = self._canvas.coords(self._id)
+        width = min(x1 - x0, y1 - y0) / 10
+        for id_ in self._shape:
+            self._canvas.itemconfigure(id_, width=width)
 
     def bind(self, event, command):
         self._canvas.tag_bind(self._id, event, command)
@@ -182,15 +192,15 @@ class BoardSquare:
 
     def _erase_shape(self):
         self._canvas.delete(*self._shape)
-        self._shape.clear()
+        self._shape = []
 
     def _fill(self, color):
         self._canvas.itemconfigure(self._id, fill=color)
 
     def _draw_shape(self, shape):
         coords = self._canvas.coords(self._id)
-        ids = shape.draw(self._canvas, *coords)
-        self._shape.extend(ids)
+        self._shape = shape.draw(self._canvas, *coords)
+        self.update_shape_width()
 
     def highlight(self, shape):
         self._fill(shape.highlight)
