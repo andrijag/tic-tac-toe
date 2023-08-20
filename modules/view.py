@@ -6,7 +6,7 @@ from .shapes import Cross, Circle
 
 class Observer(ABC):
     @abstractmethod
-    def update_(self):
+    def update_observer(self):
         pass
 
 
@@ -25,7 +25,7 @@ class View(ttk.Frame, Observer):
             player.id_: self._shapes[i] for i, player in enumerate(model.players)
         }
 
-        self.score = ScoreBoard(self)
+        self.score = ttk.Label(self, text="score")
         square_size = 100
         frame_width = square_size * model.n_columns
         frame_height = square_size * model.n_rows
@@ -49,13 +49,13 @@ class View(ttk.Frame, Observer):
     def _restart(self):
         self._model.restart()
 
-    def update_(self):
+    def update_observer(self):
         self._update_score()
         self._update_board()
 
     def _update_score(self):
         score = self._get_score()
-        self.score.update_(score)
+        self.score.configure(text=score)
 
     def _get_score(self):
         return " : ".join(str(player.score) for player in self._model.players)
@@ -87,14 +87,6 @@ class View(ttk.Frame, Observer):
                     board_square.highlight(shape)
 
 
-class ScoreBoard(ttk.Label):
-    def __init__(self, master):
-        super().__init__(master, text="score")
-
-    def update_(self, score):
-        self.configure(text=score)
-
-
 class FixedAspectRatioPadding(ttk.Frame):
     def __init__(self, parent, width, height):
         super().__init__(parent, width=width, height=height)
@@ -122,12 +114,12 @@ class FixedAspectRatioPadding(ttk.Frame):
 
 
 class BoardView(tk.Canvas):
-    def __init__(self, master, n_rows, n_columns):
+    def __init__(self, parent, n_rows, n_columns):
         square_size = 100
         canvas_width = square_size * n_columns
         canvas_height = square_size * n_rows
         super().__init__(
-            master, width=canvas_width, height=canvas_height, highlightthickness=0
+            parent, width=canvas_width, height=canvas_height, highlightthickness=0
         )
 
         self.bind("<Configure>", self._resize)
@@ -173,12 +165,6 @@ class BoardSquare:
         self._id = canvas.create_rectangle(x0, y0, x1, y1, width=2, fill="white")
         self._shape = []
 
-    def update_shape_width(self):
-        x0, y0, x1, y1 = self._canvas.coords(self._id)
-        width = min(x1 - x0, y1 - y0) / 10
-        for id_ in self._shape:
-            self._canvas.itemconfigure(id_, width=width)
-
     def bind(self, event, command):
         self._canvas.tag_bind(self._id, event, command)
 
@@ -201,6 +187,12 @@ class BoardSquare:
         coords = self._canvas.coords(self._id)
         self._shape = shape.draw(self._canvas, *coords)
         self.update_shape_width()
+
+    def update_shape_width(self):
+        x0, y0, x1, y1 = self._canvas.coords(self._id)
+        width = min(x1 - x0, y1 - y0) / 10
+        for id_ in self._shape:
+            self._canvas.itemconfigure(id_, width=width)
 
     def highlight(self, shape):
         self._fill(shape.highlight)
