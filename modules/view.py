@@ -62,7 +62,7 @@ class View(ttk.Frame, Observer):
 
     def _update_board(self):
         self._update_shapes()
-        if self._model.game_over:
+        if self._model.game_over and self._model.winner:
             self._highlight_win()
 
     def _update_shapes(self):
@@ -80,10 +80,10 @@ class View(ttk.Frame, Observer):
         for i in range(self._model.n_rows):
             for j in range(self._model.n_columns):
                 value = self._model.board[i][j]
-                winner = self._model.player
+                winner = self._model.winner
                 if value == winner.id_ and self._model.winning_move(i, j):
                     board_square = self.board.get(i, j)
-                    shape = self._player_shape[value]
+                    shape = self._player_shape[winner.id_]
                     board_square.highlight(shape)
 
 
@@ -116,8 +116,8 @@ class FixedAspectRatioPadding(ttk.Frame):
 class BoardView(tk.Canvas):
     def __init__(self, parent, n_rows, n_columns):
         square_size = 100
-        canvas_width = square_size * n_columns
-        canvas_height = square_size * n_rows
+        canvas_width = n_columns * square_size
+        canvas_height = n_rows * square_size
         super().__init__(
             parent, width=canvas_width, height=canvas_height, highlightthickness=0
         )

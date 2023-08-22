@@ -28,12 +28,16 @@ class TicTacToe(Subject):
         self.board = Board(n_rows, n_columns)
         self._evaluator = Evaluator(self.board, connect_n)
         self.game_over = False
+        self.winner = None
 
     def tick(self, i, j):
         if not self._legal_move(i, j):
             return
         self.player.tick(self.board, i, j)
         if self.winning_move(i, j):
+            self._end_game()
+            self._add_score()
+        elif self._is_draw():
             self._end_game()
         else:
             self._next_turn()
@@ -47,7 +51,17 @@ class TicTacToe(Subject):
 
     def _end_game(self):
         self.game_over = True
-        self.player.score += 1
+
+    def _add_score(self):
+        self.winner = self.player
+        self.winner.score += 1
+
+    def _is_draw(self):
+        for i in range(self.n_rows):
+            for j in range(self.n_columns):
+                if not self.board[i][j]:
+                    return False
+        return True
 
     def _next_turn(self):
         self.player = next(self._iterator)
@@ -58,6 +72,7 @@ class TicTacToe(Subject):
         self.board = Board(self.n_rows, self.n_columns)
         self._evaluator = Evaluator(self.board, self.connect_n)
         self.game_over = False
+        self.winner = None
         self.notify_observers()
 
 
