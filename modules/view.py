@@ -31,10 +31,11 @@ class View(ttk.Frame, Observer):
         frame_height = square_size * model.n_rows
         self.frame = FixedAspectRatioPadding(self, frame_width, frame_height)
         self.board = BoardView(self.frame.inner_frame, model.n_rows, model.n_columns)
-        for i in range(model.n_rows):
-            for j in range(model.n_columns):
-                self.board.get(i, j).bind(
-                    "<Button-1>", lambda event, x=i, y=j: self._click(x, y)
+        for row in range(model.n_rows):
+            for column in range(model.n_columns):
+                self.board.get(row, column).bind(
+                    "<Button-1>",
+                    lambda event, row=row, column=column: self._click(row, column),
                 )
         restart_button = ttk.Button(self, text="Restart", command=self._restart)
 
@@ -43,8 +44,8 @@ class View(ttk.Frame, Observer):
         self.board.pack(expand=True, fill="both")
         restart_button.grid(column=0, row=2, padx=10, pady=10)
 
-    def _click(self, i, j):
-        self._model.tick(i, j)
+    def _click(self, row, column):
+        self._model.tick(row, column)
 
     def _restart(self):
         self._model.restart()
@@ -66,10 +67,10 @@ class View(ttk.Frame, Observer):
             self._highlight_win()
 
     def _update_shapes(self):
-        for i in range(self._model.n_rows):
-            for j in range(self._model.n_columns):
-                board_square = self.board.get(i, j)
-                value = self._model.board[i][j]
+        for row in range(self._model.n_rows):
+            for column in range(self._model.n_columns):
+                board_square = self.board.get(row, column)
+                value = self._model.board[row][column]
                 if value:
                     shape = self._player_shape[value]
                     board_square.update_shape(shape)
@@ -77,12 +78,12 @@ class View(ttk.Frame, Observer):
                     board_square.erase()
 
     def _highlight_win(self):
-        for i in range(self._model.n_rows):
-            for j in range(self._model.n_columns):
-                value = self._model.board[i][j]
+        for row in range(self._model.n_rows):
+            for column in range(self._model.n_columns):
+                value = self._model.board[row][column]
                 winner = self._model.winner
-                if value == winner.id_ and self._model.winning_move(i, j):
-                    board_square = self.board.get(i, j)
+                if value == winner.id_ and self._model.winning_move(row, column):
+                    board_square = self.board.get(row, column)
                     shape = self._player_shape[winner.id_]
                     board_square.highlight(shape)
 
@@ -155,8 +156,8 @@ class BoardView(tk.Canvas):
     def _create_frame(self, width, height):
         return self.create_rectangle(0, 0, width, height, width=5)
 
-    def get(self, i, j):
-        return self._board[i][j]
+    def get(self, row, column):
+        return self._board[row][column]
 
 
 class BoardSquare:

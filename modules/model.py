@@ -30,24 +30,24 @@ class TicTacToe(Subject):
         self.game_over = False
         self.winner = None
 
-    def tick(self, i, j):
-        if not self._legal_move(i, j):
+    def tick(self, row, column):
+        if self.game_over or not self._legal_move(row, column):
             return
-        self.player.tick(self.board, i, j)
-        if self.winning_move(i, j):
+        self.player.tick(self.board, row, column)
+        if self.winning_move(row, column):
             self._end_game()
             self._add_score()
-        elif self._is_draw():
+        elif self._filled_board():
             self._end_game()
         else:
             self._next_turn()
         self.notify_observers()
 
-    def _legal_move(self, i, j):
-        return not self.game_over and not self.board[i][j]
+    def _legal_move(self, row, column):
+        return not self.board[row][column]
 
-    def winning_move(self, i, j):
-        return self._evaluator.check(i, j)
+    def winning_move(self, row, column):
+        return self._evaluator.check(row, column)
 
     def _end_game(self):
         self.game_over = True
@@ -56,10 +56,10 @@ class TicTacToe(Subject):
         self.winner = self.player
         self.winner.score += 1
 
-    def _is_draw(self):
-        for i in range(self.n_rows):
-            for j in range(self.n_columns):
-                if not self.board[i][j]:
+    def _filled_board(self):
+        for row in range(self.n_rows):
+            for column in range(self.n_columns):
+                if not self.board[row][column]:
                     return False
         return True
 
@@ -84,8 +84,8 @@ class Player:
     def __str__(self):
         return f"player {self.id_}"
 
-    def tick(self, board, i, j):
-        board[i][j] = self.id_
+    def tick(self, board, row, column):
+        board[row][column] = self.id_
 
 
 class Board:
