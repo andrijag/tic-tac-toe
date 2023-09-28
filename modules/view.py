@@ -31,11 +31,11 @@ class View(ttk.Frame, Observer):
         frame_height = square_size * model.n_rows
         self.frame = FixedAspectRatioPadding(self, frame_width, frame_height)
         self.board = BoardView(self.frame.inner_frame, model.n_rows, model.n_columns)
-        for row in range(model.n_rows):
-            for column in range(model.n_columns):
-                self.board.get(row, column).bind(
+        for i in range(model.n_rows):
+            for j in range(model.n_columns):
+                self.board.get(i, j).bind(
                     "<Button-1>",
-                    lambda event, row=row, column=column: self._click(row, column),
+                    lambda event, row=i, column=j: self._click(row, column),
                 )
         restart_button = ttk.Button(self, text="Restart", command=self._restart)
 
@@ -138,7 +138,7 @@ class BoardView(tk.Canvas):
         self.scale("all", 0, 0, width_ratio, height_ratio)
         for row in self._board:
             for board_square in row:
-                board_square.update_shape_width()
+                board_square.redraw_shape()
 
     def _create_board(self, n_rows, n_columns, square_size):
         board = []
@@ -164,36 +164,38 @@ class BoardSquare:
     def __init__(self, canvas, x0, y0, x1, y1):
         self._canvas = canvas
         self._id = canvas.create_rectangle(x0, y0, x1, y1, width=2, fill="white")
-        self._shape = []
+        self._shape = None
+        self._shape_id = []
 
     def bind(self, event, command):
         self._canvas.tag_bind(self._id, event, command)
 
     def update_shape(self, shape):
-        self.erase()
-        self._draw_shape(shape)
-
-    def erase(self):
+        self._shape = shape
         self._erase_shape()
-        self._fill("white")
+        self._draw_shape()
 
     def _erase_shape(self):
-        self._canvas.delete(*self._shape)
-        self._shape = []
+        self._canvas.delete(*self._shape_id)
+        self._shape_id = []
+
+    def _draw_shape(self):
+        coords = self._canvas.coords(self._id)
+        self._shape_id = self._shape.draw(self._canvas, *coords)
+
+    def erase(self):
+        self._shape = None
+        self._erase_shape()
+        self._fill("white")
 
     def _fill(self, color):
         self._canvas.itemconfigure(self._id, fill=color)
 
-    def _draw_shape(self, shape):
-        coords = self._canvas.coords(self._id)
-        self._shape = shape.draw(self._canvas, *coords)
-        self.update_shape_width()
-
-    def update_shape_width(self):
-        x0, y0, x1, y1 = self._canvas.coords(self._id)
-        width = min(x1 - x0, y1 - y0) / 10
-        for id_ in self._shape:
-            self._canvas.itemconfigure(id_, width=width)
+    def redraw_shape(self):
+        if not self._shape:
+            return
+        self._erase_shape()
+        self._draw_shape()
 
     def highlight(self, shape):
         self._fill(shape.highlight)
