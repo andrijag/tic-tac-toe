@@ -1,74 +1,89 @@
+from abc import ABC, abstractmethod
 from itertools import cycle
 
 
 class Subject:
-    def __init__(self):
+    def __init__(self) -> None:
         self._observers = []
 
-    def attach_observer(self, observer):
+    def attach_observer(self, observer: "Observer") -> None:
         self._observers.append(observer)
 
-    def detach_observer(self, observer):
+    def detach_observer(self, observer: "Observer") -> None:
         self._observers.remove(observer)
 
-    def notify_observers(self):
+    def notify_observers(self) -> None:
         for observer in self._observers:
-            observer.update_observer()
+            observer.update_()
+
+
+class Observer(ABC):
+    @abstractmethod
+    def update_(self) -> None:
+        pass
 
 
 class TicTacToe(Subject):
-    def __init__(self, n_rows, n_columns, connect_n, n_players=2):
+    def __init__(
+        self,
+        n_rows: int = 3,
+        n_columns: int = 3,
+        connect_n: int = 3,
+        n_players: int = 2,
+    ) -> None:
         super().__init__()
-        self.n_rows = n_rows
-        self.n_columns = n_columns
-        self.connect_n = connect_n
-        self.players = [Player(i) for i in range(1, n_players + 1)]
+        self.players = [Player(id_) for id_ in range(1, n_players + 1)]
         self._iterator = cycle(self.players)
-        self.player = next(self._iterator)
+        self._player = next(self._iterator)
         self.board = Board(n_rows, n_columns)
         self._evaluator = Evaluator(self.board, connect_n)
         self.game_over = False
         self.winner = None
 
-    def tick(self, row, column):
-        if self.game_over or not self._legal_move(row, column):
+    @property
+    def n_rows(self) -> int:
+        return self.board.n_rows
+
+    @property
+    def n_columns(self) -> int:
+        return self.board.n_columns
+
+    @property
+    def connect_n(self) -> int:
+        return self._evaluator.connect_n
+
+    def tick(self, row: int, column: int) -> None:
+        if not self._legal_move(row, column):
             return
-        self.player.tick(self.board, row, column)
+        self._player.tick(self.board, row, column)
         if self.winning_move(row, column):
             self._end_game()
             self._add_score()
-        elif self._filled_board():
+        elif self.board.is_filled():
             self._end_game()
         else:
             self._next_turn()
         self.notify_observers()
 
-    def _legal_move(self, row, column):
-        return not self.board[row][column]
+    def _legal_move(self, row: int, column: int) -> bool:
+        return not self.game_over and not self.board[row][column]
 
-    def winning_move(self, row, column):
+    def winning_move(self, row: int, column: int) -> bool:
         return self._evaluator.check(row, column)
 
-    def _end_game(self):
+    def _end_game(self) -> None:
         self.game_over = True
 
-    def _add_score(self):
-        self.winner = self.player
+    def _add_score(self) -> None:
+        self.winner = self._player
         self.winner.score += 1
 
-    def _filled_board(self):
-        for row in range(self.n_rows):
-            for column in range(self.n_columns):
-                if not self.board[row][column]:
-                    return False
-        return True
+    def _next_turn(self) -> None:
+        self._player = next(self._iterator)
 
-    def _next_turn(self):
-        self.player = next(self._iterator)
-
-    def restart(self):
+    def restart(self) -> None:
         self._iterator = cycle(self.players)
-        self.player = next(self._iterator)
+        self._player = next(self._iterator)
         self.board = Board(self.n_rows, self.n_columns)
         self._evaluator = Evaluator(self.board, self.connect_n)
         self.game_over = False
@@ -77,37 +92,40 @@ class TicTacToe(Subject):
 
 
 class Player:
-    def __init__(self, id_):
+    def __init__(self, id_: int) -> None:
         self.id_ = id_
         self.score = 0
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"player {self.id_}"
 
-    def tick(self, board, row, column):
+    def tick(self, board: "Board", row: int, column: int) -> None:
         board[row][column] = self.id_
 
 
 class Board:
-    def __init__(self, n_rows, n_columns):
+    def __init__(self, n_rows: int = 3, n_columns: int = 3) -> None:
         self.n_rows = n_rows
         self.n_columns = n_columns
         self._matrix = [[0 for _ in range(n_columns)] for _ in range(n_rows)]
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: int) -> list[int] | int:
         return self._matrix[key]
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: int, value: list[int] | int) -> None:
         self._matrix[key] = value
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self._matrix)
+
+    def is_filled(self) -> bool:
+        return all(all(row) for row in self._matrix)
 
 
 class Evaluator:
-    def __init__(self, board, connect_n):
+    def __init__(self, board: Board, connect_n: int = 3) -> None:
         self._board = board
-        self._connect_n = connect_n
+        self.connect_n = connect_n
         self._vectors = {
             "horizontal": (0, 1),
             "vertical": (1, 0),
@@ -115,21 +133,26 @@ class Evaluator:
             "anti-diagonal": (-1, 1),
         }
 
-    def check(self, i, j):
-        for di, dj in self._vectors.values():
-            if self._count_in_direction(i, j, di, dj) >= self._connect_n:
+    def check(self, row: int, column: int) -> bool:
+        if not self._board[row][column]:
+            return False
+        for vector in self._vectors.values():
+            if self._count_consecutive(row, column, *vector) >= self.connect_n:
                 return True
+        return False
 
-    def _count_in_direction(self, i, j, di, dj):
-        direction = self._count_consecutive(i, j, di, dj)
-        opposite_direction = self._count_consecutive(i, j, -di, -dj)
+    def _count_consecutive(self, row: int, column: int, x: int, y: int) -> int:
+        direction = self._count_in_direction(row, column, x, y)
+        opposite_direction = self._count_in_direction(row, column, -x, -y)
         return direction + opposite_direction - 1
 
-    def _count_consecutive(self, i, j, di, dj):
+    def _count_in_direction(self, row: int, column: int, x: int, y: int) -> int:
+        next_row = row + x
+        next_column = column + y
         if (
-            i + di in range(self._board.n_rows)
-            and j + dj in range(self._board.n_columns)
-            and self._board[i][j] == self._board[i + di][j + dj]
+            next_row in range(self._board.n_rows)
+            and next_column in range(self._board.n_columns)
+            and self._board[row][column] == self._board[next_row][next_column]
         ):
-            return 1 + self._count_consecutive(i + di, j + dj, di, dj)
+            return 1 + self._count_in_direction(next_row, next_column, x, y)
         return 1

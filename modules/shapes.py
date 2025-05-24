@@ -1,18 +1,23 @@
 from abc import ABC, abstractmethod
+import tkinter as tk
 
 
 class Shape(ABC):
-    def __init__(self, color, highlight):
+    def __init__(self, color: str, highlight: str) -> None:
         self._color = color
         self.highlight = highlight
 
     @abstractmethod
-    def draw(self, canvas, x0, y0, x1, y1):
+    def draw(
+        self, canvas: tk.Canvas, x0: float, y0: float, x1: float, y1: float
+    ) -> list[int]:
         pass
 
 
 class Cross(Shape):
-    def draw(self, canvas, x0, y0, x1, y1):
+    def draw(
+        self, canvas: tk.Canvas, x0: float, y0: float, x1: float, y1: float
+    ) -> list[int]:
         width = x1 - x0
         height = y1 - y0
         ipadx = width / 10
@@ -39,7 +44,9 @@ class Cross(Shape):
 
 
 class Circle(Shape):
-    def draw(self, canvas, x0, y0, x1, y1):
+    def draw(
+        self, canvas: tk.Canvas, x0: float, y0: float, x1: float, y1: float
+    ) -> list[int]:
         width = x1 - x0
         height = y1 - y0
         ipadx = width / 10

@@ -1,17 +1,13 @@
+from collections.abc import Callable
 import tkinter as tk
 from tkinter import ttk
-from abc import ABC, abstractmethod
-from .shapes import Cross, Circle
 
-
-class Observer(ABC):
-    @abstractmethod
-    def update_observer(self):
-        pass
+from .model import Observer, TicTacToe
+from .shapes import Cross, Circle, Shape
 
 
 class View(ttk.Frame, Observer):
-    def __init__(self, parent, model):
+    def __init__(self, parent: tk.Misc, model: TicTacToe) -> None:
         super().__init__(parent)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -19,6 +15,7 @@ class View(ttk.Frame, Observer):
         self.rowconfigure(2, weight=1)
 
         self._model = model
+        thickness = 10
         self._shapes = [Cross("blue", "light blue"), Circle("red", "pink")]
 
         self._player_shape = {
@@ -30,7 +27,9 @@ class View(ttk.Frame, Observer):
         frame_width = square_size * model.n_columns
         frame_height = square_size * model.n_rows
         self.frame = FixedAspectRatioPadding(self, frame_width, frame_height)
-        self.board = BoardView(self.frame.inner_frame, model.n_rows, model.n_columns)
+        self.board = BoardView(
+            self.frame.inner_frame, model.n_rows, model.n_columns, square_size
+        )
         for i in range(model.n_rows):
             for j in range(model.n_columns):
                 self.board.get(i, j).bind(
@@ -44,29 +43,29 @@ class View(ttk.Frame, Observer):
         self.board.pack(expand=True, fill="both")
         restart_button.grid(column=0, row=2, padx=10, pady=10)
 
-    def _click(self, row, column):
+    def _click(self, row: int, column: int) -> None:
         self._model.tick(row, column)
 
-    def _restart(self):
+    def _restart(self) -> None:
         self._model.restart()
 
-    def update_observer(self):
+    def update_(self) -> None:
         self._update_score()
         self._update_board()
 
-    def _update_score(self):
+    def _update_score(self) -> None:
         score = self._get_score()
         self.score.configure(text=score)
 
-    def _get_score(self):
+    def _get_score(self) -> str:
         return " : ".join(str(player.score) for player in self._model.players)
 
-    def _update_board(self):
+    def _update_board(self) -> None:
         self._update_shapes()
         if self._model.game_over and self._model.winner:
             self._highlight_win()
 
-    def _update_shapes(self):
+    def _update_shapes(self) -> None:
         for row in range(self._model.n_rows):
             for column in range(self._model.n_columns):
                 board_square = self.board.get(row, column)
@@ -77,7 +76,7 @@ class View(ttk.Frame, Observer):
                 else:
                     board_square.erase()
 
-    def _highlight_win(self):
+    def _highlight_win(self) -> None:
         for row in range(self._model.n_rows):
             for column in range(self._model.n_columns):
                 value = self._model.board[row][column]
@@ -89,7 +88,7 @@ class View(ttk.Frame, Observer):
 
 
 class FixedAspectRatioPadding(ttk.Frame):
-    def __init__(self, parent, width, height):
+    def __init__(self, parent: ttk.Frame, width: int, height: int) -> None:
         super().__init__(parent, width=width, height=height)
 
         self.bind("<Configure>", self._resize)
@@ -101,7 +100,7 @@ class FixedAspectRatioPadding(ttk.Frame):
             width=width, height=height, anchor="center", x=width / 2, y=height / 2
         )
 
-    def _resize(self, event):
+    def _resize(self, event) -> None:
         widget_width = min(event.height * self.aspect_ratio, event.width)
         widget_height = min(event.height, event.width / self.aspect_ratio)
         self.inner_frame.place(
@@ -115,8 +114,13 @@ class FixedAspectRatioPadding(ttk.Frame):
 
 
 class BoardView(tk.Canvas):
-    def __init__(self, parent, n_rows, n_columns):
-        square_size = 100
+    def __init__(
+        self,
+        parent: ttk.Frame,
+        n_rows: int = 3,
+        n_columns: int = 3,
+        square_size: int = 100,
+    ) -> None:
         canvas_width = n_columns * square_size
         canvas_height = n_rows * square_size
         super().__init__(
@@ -126,21 +130,23 @@ class BoardView(tk.Canvas):
         self.bind("<Configure>", self._resize)
 
         self._board = self._create_board(n_rows, n_columns, square_size)
-        self._frame = self._create_frame(canvas_width, canvas_height)
+        self._create_frame(canvas_width, canvas_height)
 
-    def _resize(self, event):
+    def _resize(self, event: tk.Event) -> None:
         width_ratio = event.width / self.winfo_reqwidth()
         height_ratio = event.height / self.winfo_reqheight()
         self._scale_board(width_ratio, height_ratio)
         self.configure(width=event.width, height=event.height)
 
-    def _scale_board(self, width_ratio, height_ratio):
+    def _scale_board(self, width_ratio: float, height_ratio: float) -> None:
         self.scale("all", 0, 0, width_ratio, height_ratio)
         for row in self._board:
             for board_square in row:
                 board_square.redraw_shape()
 
-    def _create_board(self, n_rows, n_columns, square_size):
+    def _create_board(
+        self, n_rows: int, n_columns: int, square_size: int
+    ) -> list[list["BoardSquare"]]:
         board = []
         for i in range(n_rows):
             row = []
@@ -153,49 +159,49 @@ class BoardView(tk.Canvas):
             board.append(row)
         return board
 
-    def _create_frame(self, width, height):
-        return self.create_rectangle(0, 0, width, height, width=5)
+    def _create_frame(self, width: int, height: int) -> None:
+        self.create_rectangle(0, 0, width, height, width=5)
 
-    def get(self, row, column):
+    def get(self, row: int, column: int) -> "BoardSquare":
         return self._board[row][column]
 
 
 class BoardSquare:
-    def __init__(self, canvas, x0, y0, x1, y1):
+    def __init__(self, canvas: tk.Canvas, x0: int, y0: int, x1: int, y1: int) -> None:
         self._canvas = canvas
         self._id = canvas.create_rectangle(x0, y0, x1, y1, width=2, fill="white")
         self._shape = None
         self._shape_id = []
 
-    def bind(self, event, command):
+    def bind(self, event: str, command: Callable[[tk.Event], None]) -> None:
         self._canvas.tag_bind(self._id, event, command)
 
-    def update_shape(self, shape):
+    def update_shape(self, shape: Shape) -> None:
         self._shape = shape
         self._erase_shape()
         self._draw_shape()
 
-    def _erase_shape(self):
+    def _erase_shape(self) -> None:
         self._canvas.delete(*self._shape_id)
         self._shape_id = []
 
-    def _draw_shape(self):
+    def _draw_shape(self) -> None:
         coords = self._canvas.coords(self._id)
         self._shape_id = self._shape.draw(self._canvas, *coords)
 
-    def erase(self):
+    def erase(self) -> None:
         self._shape = None
         self._erase_shape()
         self._fill("white")
 
-    def _fill(self, color):
-        self._canvas.itemconfigure(self._id, fill=color)
+    def _fill(self, color: str) -> None:
+        self._canvas.itemconfig(self._id, fill=color)
 
-    def redraw_shape(self):
+    def redraw_shape(self) -> None:
         if not self._shape:
             return
         self._erase_shape()
         self._draw_shape()
 
-    def highlight(self, shape):
+    def highlight(self, shape: Shape) -> None:
         self._fill(shape.highlight)
