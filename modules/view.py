@@ -15,7 +15,6 @@ class View(ttk.Frame, Observer):
         self.rowconfigure(2, weight=1)
 
         self._model = model
-        thickness = 10
         self._shapes = [Cross("blue", "light blue"), Circle("red", "pink")]
 
         self._player_shape = {
