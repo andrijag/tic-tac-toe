@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from enum import Enum
 from itertools import cycle
 
 
@@ -34,7 +35,7 @@ class TicTacToe(Subject):
         super().__init__()
         self.players = [Player(id_) for id_ in range(1, n_players + 1)]
         self._iterator = cycle(self.players)
-        self._player = next(self._iterator)
+        self.player = next(self._iterator)
         self.board = Board(n_rows, n_columns)
         self._evaluator = Evaluator(self.board, connect_n)
         self.game_over = False
@@ -53,10 +54,10 @@ class TicTacToe(Subject):
         return self._evaluator.connect_n
 
     def tick(self, row: int, column: int) -> None:
-        if not self._legal_move(row, column):
+        if not self._is_legal_move(row, column):
             return
-        self._player.tick(self.board, row, column)
-        if self.winning_move(row, column):
+        self.player.tick(self.board, row, column)
+        if self.is_winning_move(row, column):
             self._end_game()
             self._add_score()
         elif self.board.is_filled():
@@ -65,25 +66,25 @@ class TicTacToe(Subject):
             self._next_turn()
         self.notify_observers()
 
-    def _legal_move(self, row: int, column: int) -> bool:
+    def _is_legal_move(self, row: int, column: int) -> bool:
         return not self.game_over and not self.board[row][column]
 
-    def winning_move(self, row: int, column: int) -> bool:
+    def is_winning_move(self, row: int, column: int) -> bool:
         return self._evaluator.check(row, column)
 
     def _end_game(self) -> None:
         self.game_over = True
 
     def _add_score(self) -> None:
-        self.winner = self._player
+        self.winner = self.player
         self.winner.score += 1
 
     def _next_turn(self) -> None:
-        self._player = next(self._iterator)
+        self.player = next(self._iterator)
 
     def restart(self) -> None:
         self._iterator = cycle(self.players)
-        self._player = next(self._iterator)
+        self.player = next(self._iterator)
         self.board = Board(self.n_rows, self.n_columns)
         self._evaluator = Evaluator(self.board, self.connect_n)
         self.game_over = False
@@ -126,18 +127,12 @@ class Evaluator:
     def __init__(self, board: Board, connect_n: int = 3) -> None:
         self._board = board
         self.connect_n = connect_n
-        self._vectors = {
-            "horizontal": (0, 1),
-            "vertical": (1, 0),
-            "diagonal": (1, 1),
-            "anti-diagonal": (-1, 1),
-        }
 
     def check(self, row: int, column: int) -> bool:
         if not self._board[row][column]:
             return False
-        for vector in self._vectors.values():
-            if self._count_consecutive(row, column, *vector) >= self.connect_n:
+        for vector in Vector:
+            if self._count_consecutive(row, column, *vector.value) >= self.connect_n:
                 return True
         return False
 
@@ -156,3 +151,10 @@ class Evaluator:
         ):
             return 1 + self._count_in_direction(next_row, next_column, x, y)
         return 1
+
+
+class Vector(Enum):
+    HORIZONTAL = (0, 1)
+    VERTICAL = (1, 0)
+    DIAGONAL = (1, 1)
+    ANTI_DIAGONAL = (-1, 1)

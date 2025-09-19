@@ -80,7 +80,7 @@ class View(ttk.Frame, Observer):
             for column in range(self._model.n_columns):
                 value = self._model.board[row][column]
                 winner = self._model.winner
-                if value == winner.id_ and self._model.winning_move(row, column):
+                if value == winner.id_ and self._model.is_winning_move(row, column):
                     board_square = self.board.get(row, column)
                     shape = self._player_shape[winner.id_]
                     board_square.highlight(shape)
