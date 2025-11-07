@@ -3,7 +3,7 @@ from enum import Enum
 from itertools import cycle
 
 
-class Subject:
+class Observable:
     def __init__(self) -> None:
         self._observers = []
 
@@ -24,7 +24,7 @@ class Observer(ABC):
         pass
 
 
-class TicTacToe(Subject):
+class TicTacToe(Observable):
     def __init__(
         self,
         n_rows: int = 3,
