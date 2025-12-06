@@ -38,7 +38,7 @@ class TicTacToe(Observable):
         self.player = next(self._iterator)
         self.board = Board(n_rows, n_columns)
         self._evaluator = Evaluator(self.board, connect_n)
-        self.game_over = False
+        self.is_game_over = False
         self.winner = None
 
     @property
@@ -67,13 +67,13 @@ class TicTacToe(Observable):
         self.notify_observers()
 
     def _is_legal_move(self, row: int, column: int) -> bool:
-        return not self.game_over and not self.board[row][column]
+        return not self.is_game_over and not self.board[row][column]
 
     def is_winning_move(self, row: int, column: int) -> bool:
         return self._evaluator.check(row, column)
 
     def _end_game(self) -> None:
-        self.game_over = True
+        self.is_game_over = True
 
     def _add_score(self) -> None:
         self.winner = self.player
@@ -87,7 +87,7 @@ class TicTacToe(Observable):
         self.player = next(self._iterator)
         self.board = Board(self.n_rows, self.n_columns)
         self._evaluator = Evaluator(self.board, self.connect_n)
-        self.game_over = False
+        self.is_game_over = False
         self.winner = None
         self.notify_observers()
 

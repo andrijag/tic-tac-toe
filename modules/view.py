@@ -54,14 +54,14 @@ class View(ttk.Frame, Observer):
 
     def _update_score(self) -> None:
         score = self._get_score()
-        self.score.configure(text=score)
+        self.score["text"] = score
 
     def _get_score(self) -> str:
         return " : ".join(str(player.score) for player in self._model.players)
 
     def _update_board(self) -> None:
         self._update_shapes()
-        if self._model.game_over and self._model.winner:
+        if self._model.is_game_over and self._model.winner:
             self._highlight_win()
 
     def _update_shapes(self) -> None:
@@ -109,7 +109,7 @@ class FixedAspectRatioPadding(ttk.Frame):
             x=event.width / 2,
             y=event.height / 2,
         )
-        self.configure(width=event.width, height=event.height)
+        self.config(width=event.width, height=event.height)
 
 
 class BoardView(tk.Canvas):
@@ -135,7 +135,7 @@ class BoardView(tk.Canvas):
         width_ratio = event.width / self.winfo_reqwidth()
         height_ratio = event.height / self.winfo_reqheight()
         self._scale_board(width_ratio, height_ratio)
-        self.configure(width=event.width, height=event.height)
+        self.config(width=event.width, height=event.height)
 
     def _scale_board(self, width_ratio: float, height_ratio: float) -> None:
         self.scale("all", 0, 0, width_ratio, height_ratio)
